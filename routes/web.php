@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicProjectController;
-use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -19,7 +18,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('projects', ProjectController::class);
-    Route::resource('units', UnitController::class);
 });
 
 // Public project view (no auth required)
