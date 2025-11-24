@@ -39,5 +39,74 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
+}
+
+export interface Project {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    location: string;
+    city: string;
+    country: string;
+    total_units: number;
+    min_price: string | null;
+    max_price: string | null;
+    currency: string;
+    status: 'planning' | 'under_construction' | 'completed' | 'sold_out';
+    completion_date: string | null;
+    developer: string | null;
+    amenities: string[] | null;
+    images: string[] | null;
+    cover_image: string | null;
+    is_featured: boolean;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    units_count?: number;
+    units?: Unit[];
+}
+
+export interface Unit {
+    id: number;
+    project_id: number;
+    unit_number: string;
+    name: string | null;
+    type: 'studio' | '1br' | '2br' | '3br' | '4br' | '5br' | 'penthouse' | 'duplex' | 'townhouse' | 'villa';
+    floor: number | null;
+    size_sqft: string;
+    size_sqm: string | null;
+    bedrooms: number;
+    bathrooms: number;
+    price: string;
+    currency: string;
+    status: 'available' | 'reserved' | 'sold' | 'rented';
+    view: 'sea' | 'city' | 'garden' | 'pool' | 'park' | 'marina' | 'golf' | 'other' | null;
+    has_balcony: boolean;
+    has_parking: boolean;
+    parking_spots: number;
+    features: string[] | null;
+    images: string[] | null;
+    floor_plan: string | null;
+    notes: string | null;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    project?: Project;
+}
+
+export interface PaginatedData<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
 }
