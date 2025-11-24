@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ImageUpload, type ImageFile } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -53,8 +54,9 @@ const steps = [
     { id: 1, name: 'Basic Info', description: 'Project details' },
     { id: 2, name: 'Location', description: 'Address and location' },
     { id: 3, name: 'Pricing', description: 'Price range and status' },
-    { id: 4, name: 'Units', description: 'Add units to project' },
-    { id: 5, name: 'Review', description: 'Review and submit' },
+    { id: 4, name: 'Images', description: 'Hero and gallery images' },
+    { id: 5, name: 'Units', description: 'Add units to project' },
+    { id: 6, name: 'Review', description: 'Review and submit' },
 ];
 
 export default function ProjectCreate() {
@@ -80,6 +82,9 @@ export default function ProjectCreate() {
     });
 
     const [units, setUnits] = useState<UnitData[]>([]);
+
+    const [heroImages, setHeroImages] = useState<ImageFile[]>([]);
+    const [galleryImages, setGalleryImages] = useState<ImageFile[]>([]);
 
     const [newUnit, setNewUnit] = useState<UnitData>({
         id: '',
@@ -131,19 +136,74 @@ export default function ProjectCreate() {
     };
 
     const handleSubmit = () => {
-        setProcessing(true);
+        console.log('=== Form Submission Started ===');
+        console.log('Project Data:', projectData);
+        console.log('Units:', units);
+        console.log('Hero Images:', heroImages);
+        console.log('Gallery Images:', galleryImages);
 
-        router.post(store().url, {
-            ...projectData,
-            total_units: units.length,
-            units: units.map(({ id, ...unit }) => unit),
-        }, {
+        setProcessing(true);
+        setErrors({});
+
+        const formData = new FormData();
+
+        // Add project data
+        Object.entries(projectData).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== '') {
+                // Convert boolean values to 1/0 for Laravel
+                if (typeof value === 'boolean') {
+                    formData.append(key, value ? '1' : '0');
+                } else {
+                    formData.append(key, value.toString());
+                }
+            }
+        });
+
+        formData.append('total_units', units.length.toString());
+
+        // Add units as JSON
+        if (units.length > 0) {
+            const unitsData = units.map(({ id, ...unit }) => unit);
+            console.log('Units being sent:', unitsData);
+            formData.append('units', JSON.stringify(unitsData));
+        }
+
+        // Add hero images
+        heroImages.forEach((image, index) => {
+            if (image.file) {
+                console.log(`Adding hero image ${index}:`, image.file.name);
+                formData.append(`hero_images[${index}]`, image.file);
+            }
+        });
+
+        // Add gallery images
+        galleryImages.forEach((image, index) => {
+            if (image.file) {
+                console.log(`Adding gallery image ${index}:`, image.file.name);
+                formData.append(`gallery_images[${index}]`, image.file);
+            }
+        });
+
+        console.log('Submitting to:', store().url);
+        console.log('FormData entries:');
+        for (const [key, value] of formData.entries()) {
+            console.log(`  ${key}:`, value instanceof File ? `File: ${value.name}` : value);
+        }
+
+        router.post(store().url, formData, {
+            forceFormData: true,
             onError: (errors) => {
+                console.error('=== Form Submission Error ===');
+                console.error('Errors:', errors);
                 setErrors(errors);
                 setProcessing(false);
             },
             onSuccess: () => {
+                console.log('=== Form Submission Success ===');
                 setProcessing(false);
+            },
+            onFinish: () => {
+                console.log('=== Form Submission Finished ===');
             },
         });
     };
@@ -159,6 +219,8 @@ export default function ProjectCreate() {
             case 4:
                 return true;
             case 5:
+                return true;
+            case 6:
                 return true;
             default:
                 return false;
@@ -399,8 +461,35 @@ export default function ProjectCreate() {
                             </div>
                         )}
 
-                        {/* Step 4: Units */}
+                        {/* Step 4: Images */}
                         {currentStep === 4 && (
+                            <div className="space-y-6">
+                                <div>
+                                    <ImageUpload
+                                        value={heroImages}
+                                        onChange={setHeroImages}
+                                        maxFiles={5}
+                                        label="Hero Images"
+                                        description="These images will be displayed in the hero slider on the public project page. Drag to reorder."
+                                        error={errors.hero_images}
+                                    />
+                                </div>
+                                <Separator />
+                                <div>
+                                    <ImageUpload
+                                        value={galleryImages}
+                                        onChange={setGalleryImages}
+                                        maxFiles={20}
+                                        label="Gallery Images"
+                                        description="These images will be displayed in the gallery section. Drag to reorder."
+                                        error={errors.gallery_images}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 5: Units */}
+                        {currentStep === 5 && (
                             <div className="space-y-6">
                                 <div className="rounded-lg border p-4">
                                     <h3 className="mb-4 font-medium">Add Unit</h3>
@@ -536,8 +625,8 @@ export default function ProjectCreate() {
                             </div>
                         )}
 
-                        {/* Step 5: Review */}
-                        {currentStep === 5 && (
+                        {/* Step 6: Review */}
+                        {currentStep === 6 && (
                             <div className="space-y-6">
                                 <div className="grid gap-6 md:grid-cols-2">
                                     <Card>
@@ -618,7 +707,7 @@ export default function ProjectCreate() {
                                 {currentStep === 1 ? 'Cancel' : 'Previous'}
                             </Button>
                             <div className="flex gap-2">
-                                {currentStep < 5 && (
+                                {currentStep < 6 && (
                                     <Button
                                         type="button"
                                         onClick={() => setCurrentStep(currentStep + 1)}
@@ -627,7 +716,7 @@ export default function ProjectCreate() {
                                         Next
                                     </Button>
                                 )}
-                                {currentStep === 5 && (
+                                {currentStep === 6 && (
                                     <Button
                                         type="button"
                                         onClick={handleSubmit}

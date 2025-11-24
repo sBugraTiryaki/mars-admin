@@ -30,20 +30,80 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-        $units = $validated['units'] ?? [];
-        unset($validated['units']);
+        \Log::info('=== Project Store Request Started ===');
+        \Log::info('Request Data:', $request->all());
+        \Log::info('Files:', $request->allFiles());
 
-        $project = Project::create($validated);
+        try {
+            $validated = $request->validated();
+            \Log::info('Validation passed', ['validated' => $validated]);
 
-        if (! empty($units)) {
-            foreach ($units as $unitData) {
-                $project->units()->create($unitData);
+            // Extract units (already decoded by prepareForValidation)
+            $units = $validated['units'] ?? [];
+
+            // Remove fields that shouldn't be saved directly to project
+            $projectData = collect($validated)->except([
+                'units',
+                'hero_images',
+                'gallery_images',
+            ])->toArray();
+
+            // Set default values if not provided
+            $projectData['country'] = $projectData['country'] ?? 'UAE';
+            $projectData['currency'] = $projectData['currency'] ?? 'AED';
+            $projectData['status'] = $projectData['status'] ?? 'planning';
+            $projectData['is_featured'] = $projectData['is_featured'] ?? false;
+            $projectData['is_active'] = $projectData['is_active'] ?? true;
+
+            $project = Project::create($projectData);
+
+            // Handle hero images
+            if ($request->hasFile('hero_images')) {
+                foreach ($request->file('hero_images') as $image) {
+                    $project->addMedia($image)
+                        ->toMediaCollection('hero');
+                }
             }
-        }
 
-        return redirect()->route('projects.index')
-            ->with('success', 'Project created successfully.');
+            // Handle gallery images
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $image) {
+                    $project->addMedia($image)
+                        ->toMediaCollection('gallery');
+                }
+            }
+
+            // Create units
+            if (! empty($units)) {
+                foreach ($units as $unitData) {
+                    // Set default values for units
+                    $unitData['currency'] = $unitData['currency'] ?? $project->currency;
+                    $unitData['status'] = $unitData['status'] ?? 'available';
+                    $unitData['is_active'] = $unitData['is_active'] ?? true;
+
+                    $project->units()->create($unitData);
+                }
+            }
+
+            \Log::info('Project created successfully', [
+                'project_id' => $project->id,
+                'units_count' => count($units),
+            ]);
+
+            return redirect()->route('projects.index')
+                ->with('success', 'Project created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', [
+                'errors' => $e->errors(),
+            ]);
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Project creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
     }
 
     public function show(Project $project): Response

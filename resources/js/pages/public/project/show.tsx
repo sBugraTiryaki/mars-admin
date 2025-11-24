@@ -14,7 +14,11 @@ import { InquiryModal } from './components/InquiryModal';
 import { UnitModal } from './components/UnitModal';
 
 interface Props {
-    project: Project & { units: Unit[] };
+    project: Project & {
+        units: Unit[];
+        hero_images?: string[];
+        gallery_images?: string[];
+    };
 }
 
 export default function PublicProjectShow({ project }: Props) {
@@ -86,11 +90,15 @@ export default function PublicProjectShow({ project }: Props) {
         return labels[status] || status;
     };
 
-    // Get hero images from project
-    const heroImages = project.images?.slice(0, 3) || (project.cover_image ? [project.cover_image] : []);
+    // Get hero images from media library (with fallback to legacy images)
+    const heroImages = project.hero_images?.length
+        ? project.hero_images
+        : project.images?.slice(0, 3) || (project.cover_image ? [project.cover_image] : []);
 
-    // Get gallery images
-    const galleryImages = project.images || [];
+    // Get gallery images from media library (with fallback to legacy images)
+    const galleryImages = project.gallery_images?.length
+        ? project.gallery_images
+        : project.images || [];
 
     return (
         <>
