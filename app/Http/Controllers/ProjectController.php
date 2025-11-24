@@ -30,7 +30,17 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request): RedirectResponse
     {
-        Project::create($request->validated());
+        $validated = $request->validated();
+        $units = $validated['units'] ?? [];
+        unset($validated['units']);
+
+        $project = Project::create($validated);
+
+        if (! empty($units)) {
+            foreach ($units as $unitData) {
+                $project->units()->create($unitData);
+            }
+        }
 
         return redirect()->route('projects.index')
             ->with('success', 'Project created successfully.');

@@ -2,6 +2,22 @@ import { index, create, show, edit, destroy } from '@/actions/App/Http/Controlle
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PaginatedData, type Unit } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
@@ -59,86 +75,95 @@ export default function UnitsIndex({ units }: Props) {
                         <CardTitle>All Units ({units.total})</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="px-4 py-3 text-left font-medium">Unit</th>
-                                        <th className="px-4 py-3 text-left font-medium">Project</th>
-                                        <th className="px-4 py-3 text-left font-medium">Type</th>
-                                        <th className="px-4 py-3 text-left font-medium">Size</th>
-                                        <th className="px-4 py-3 text-left font-medium">Beds/Baths</th>
-                                        <th className="px-4 py-3 text-left font-medium">Price</th>
-                                        <th className="px-4 py-3 text-left font-medium">Status</th>
-                                        <th className="px-4 py-3 text-right font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {units.data.map((unit) => (
-                                        <tr key={unit.id} className="border-b hover:bg-muted/50">
-                                            <td className="px-4 py-3">
-                                                <div className="font-medium">{unit.unit_number}</div>
-                                                {unit.floor && (
-                                                    <div className="text-muted-foreground text-xs">
-                                                        Floor {unit.floor}
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-3">{unit.project?.name || '-'}</td>
-                                            <td className="px-4 py-3 uppercase">{unit.type}</td>
-                                            <td className="px-4 py-3">{unit.size_sqft} sqft</td>
-                                            <td className="px-4 py-3">
-                                                {unit.bedrooms} / {unit.bathrooms}
-                                            </td>
-                                            <td className="px-4 py-3">{formatPrice(unit.price, unit.currency)}</td>
-                                            <td className="px-4 py-3">
-                                                <Badge className={statusColors[unit.status]}>{unit.status}</Badge>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" asChild>
-                                                        <Link href={show(unit.id).url}>
-                                                            <EyeIcon className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" asChild>
-                                                        <Link href={edit(unit.id).url}>
-                                                            <PencilIcon className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDelete(unit)}
-                                                    >
-                                                        <TrashIcon className="h-4 w-4 text-destructive" />
-                                                    </Button>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Unit</TableHead>
+                                    <TableHead>Project</TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Size</TableHead>
+                                    <TableHead>Beds/Baths</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {units.data.map((unit) => (
+                                    <TableRow key={unit.id}>
+                                        <TableCell>
+                                            <div className="font-medium">{unit.unit_number}</div>
+                                            {unit.floor && (
+                                                <div className="text-muted-foreground text-xs">
+                                                    Floor {unit.floor}
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>{unit.project?.name || '-'}</TableCell>
+                                        <TableCell className="uppercase">{unit.type}</TableCell>
+                                        <TableCell>{unit.size_sqft} sqft</TableCell>
+                                        <TableCell>
+                                            {unit.bedrooms} / {unit.bathrooms}
+                                        </TableCell>
+                                        <TableCell>{formatPrice(unit.price, unit.currency)}</TableCell>
+                                        <TableCell>
+                                            <Badge className={statusColors[unit.status]}>{unit.status}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={show(unit.id).url}>
+                                                        <EyeIcon className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={edit(unit.id).url}>
+                                                        <PencilIcon className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(unit)}
+                                                >
+                                                    <TrashIcon className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
 
                         {units.last_page > 1 && (
-                            <div className="mt-4 flex justify-center gap-2">
-                                {units.links.map((link, i) => (
-                                    <Button
-                                        key={i}
-                                        variant={link.active ? 'default' : 'outline'}
-                                        size="sm"
-                                        disabled={!link.url}
-                                        asChild={!!link.url}
-                                    >
-                                        {link.url ? (
-                                            <Link href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        ) : (
-                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        )}
-                                    </Button>
-                                ))}
-                            </div>
+                            <Pagination className="mt-4">
+                                <PaginationContent>
+                                    {units.current_page > 1 && (
+                                        <PaginationItem>
+                                            <PaginationPrevious
+                                                href={units.links[0]?.url || '#'}
+                                            />
+                                        </PaginationItem>
+                                    )}
+                                    {units.links.slice(1, -1).map((link, i) => (
+                                        <PaginationItem key={i}>
+                                            <PaginationLink
+                                                href={link.url || '#'}
+                                                isActive={link.active}
+                                            >
+                                                {link.label}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    {units.current_page < units.last_page && (
+                                        <PaginationItem>
+                                            <PaginationNext
+                                                href={units.links[units.links.length - 1]?.url || '#'}
+                                            />
+                                        </PaginationItem>
+                                    )}
+                                </PaginationContent>
+                            </Pagination>
                         )}
                     </CardContent>
                 </Card>

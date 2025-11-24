@@ -1,11 +1,20 @@
 import { index, edit } from '@/actions/App/Http/Controllers/ProjectController';
+import { show as publicShow } from '@/actions/App/Http/Controllers/PublicProjectController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Project } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { PencilIcon, ArrowLeftIcon } from 'lucide-react';
+import { PencilIcon, ArrowLeftIcon, ExternalLinkIcon } from 'lucide-react';
 
 interface Props {
     project: Project;
@@ -60,12 +69,20 @@ export default function ProjectShow({ project }: Props) {
                         <h1 className="text-2xl font-bold">{project.name}</h1>
                         {project.is_featured && <Badge variant="secondary">Featured</Badge>}
                     </div>
-                    <Button asChild>
-                        <Link href={edit(project.id).url}>
-                            <PencilIcon className="mr-2 h-4 w-4" />
-                            Edit
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" asChild>
+                            <a href={publicShow(project.slug).url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLinkIcon className="mr-2 h-4 w-4" />
+                                View Public
+                            </a>
+                        </Button>
+                        <Button asChild>
+                            <Link href={edit(project.id).url}>
+                                <PencilIcon className="mr-2 h-4 w-4" />
+                                Edit
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
@@ -161,32 +178,30 @@ export default function ProjectShow({ project }: Props) {
                             <CardTitle>Recent Units</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr className="border-b">
-                                            <th className="px-4 py-3 text-left font-medium">Unit</th>
-                                            <th className="px-4 py-3 text-left font-medium">Type</th>
-                                            <th className="px-4 py-3 text-left font-medium">Size</th>
-                                            <th className="px-4 py-3 text-left font-medium">Price</th>
-                                            <th className="px-4 py-3 text-left font-medium">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {project.units.map((unit) => (
-                                            <tr key={unit.id} className="border-b">
-                                                <td className="px-4 py-3">{unit.unit_number}</td>
-                                                <td className="px-4 py-3 uppercase">{unit.type}</td>
-                                                <td className="px-4 py-3">{unit.size_sqft} sqft</td>
-                                                <td className="px-4 py-3">
-                                                    {formatPrice(unit.price, unit.currency)}
-                                                </td>
-                                                <td className="px-4 py-3 capitalize">{unit.status}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Unit</TableHead>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead>Size</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {project.units.map((unit) => (
+                                        <TableRow key={unit.id}>
+                                            <TableCell>{unit.unit_number}</TableCell>
+                                            <TableCell className="uppercase">{unit.type}</TableCell>
+                                            <TableCell>{unit.size_sqft} sqft</TableCell>
+                                            <TableCell>
+                                                {formatPrice(unit.price, unit.currency)}
+                                            </TableCell>
+                                            <TableCell className="capitalize">{unit.status}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </CardContent>
                     </Card>
                 )}

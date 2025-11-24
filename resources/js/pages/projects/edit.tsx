@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Project } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -97,9 +98,9 @@ export default function ProjectEdit({ project }: Props) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="description">Description</Label>
-                                <textarea
+                                <Textarea
                                     id="description"
-                                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    className="min-h-[100px]"
                                     value={data.description}
                                     onChange={(e) => setData('description', e.target.value)}
                                 />

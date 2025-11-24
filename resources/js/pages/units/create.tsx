@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -288,9 +289,9 @@ export default function UnitCreate({ projects }: Props) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="notes">Notes</Label>
-                                <textarea
+                                <Textarea
                                     id="notes"
-                                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    className="min-h-[80px]"
                                     value={data.notes}
                                     onChange={(e) => setData('notes', e.target.value)}
                                 />

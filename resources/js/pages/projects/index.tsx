@@ -2,6 +2,22 @@ import { index, create, show, edit, destroy } from '@/actions/App/Http/Controlle
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PaginatedData, type Project } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
@@ -67,96 +83,105 @@ export default function ProjectsIndex({ projects }: Props) {
                         <CardTitle>All Projects ({projects.total})</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="px-4 py-3 text-left font-medium">Name</th>
-                                        <th className="px-4 py-3 text-left font-medium">Location</th>
-                                        <th className="px-4 py-3 text-left font-medium">Developer</th>
-                                        <th className="px-4 py-3 text-left font-medium">Status</th>
-                                        <th className="px-4 py-3 text-left font-medium">Units</th>
-                                        <th className="px-4 py-3 text-left font-medium">Price Range</th>
-                                        <th className="px-4 py-3 text-right font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {projects.data.map((project) => (
-                                        <tr key={project.id} className="border-b hover:bg-muted/50">
-                                            <td className="px-4 py-3">
-                                                <div>
-                                                    <div className="font-medium">{project.name}</div>
-                                                    {project.is_featured && (
-                                                        <Badge variant="secondary" className="mt-1 text-xs">
-                                                            Featured
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div>{project.location}</div>
-                                                <div className="text-muted-foreground text-xs">
-                                                    {project.city}, {project.country}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3">{project.developer || '-'}</td>
-                                            <td className="px-4 py-3">
-                                                <Badge className={statusColors[project.status]}>
-                                                    {statusLabels[project.status]}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-4 py-3">{project.units_count ?? 0}</td>
-                                            <td className="px-4 py-3">
-                                                <div className="text-xs">
-                                                    {formatPrice(project.min_price, project.currency)} -{' '}
-                                                    {formatPrice(project.max_price, project.currency)}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" asChild>
-                                                        <Link href={show(project.id).url}>
-                                                            <EyeIcon className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" asChild>
-                                                        <Link href={edit(project.id).url}>
-                                                            <PencilIcon className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDelete(project)}
-                                                    >
-                                                        <TrashIcon className="h-4 w-4 text-destructive" />
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Location</TableHead>
+                                    <TableHead>Developer</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Units</TableHead>
+                                    <TableHead>Price Range</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {projects.data.map((project) => (
+                                    <TableRow key={project.id}>
+                                        <TableCell>
+                                            <div>
+                                                <div className="font-medium">{project.name}</div>
+                                                {project.is_featured && (
+                                                    <Badge variant="secondary" className="mt-1 text-xs">
+                                                        Featured
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>{project.location}</div>
+                                            <div className="text-muted-foreground text-xs">
+                                                {project.city}, {project.country}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>{project.developer || '-'}</TableCell>
+                                        <TableCell>
+                                            <Badge className={statusColors[project.status]}>
+                                                {statusLabels[project.status]}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>{project.units_count ?? 0}</TableCell>
+                                        <TableCell>
+                                            <div className="text-xs">
+                                                {formatPrice(project.min_price, project.currency)} -{' '}
+                                                {formatPrice(project.max_price, project.currency)}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={show(project.id).url}>
+                                                        <EyeIcon className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={edit(project.id).url}>
+                                                        <PencilIcon className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(project)}
+                                                >
+                                                    <TrashIcon className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
 
                         {projects.last_page > 1 && (
-                            <div className="mt-4 flex justify-center gap-2">
-                                {projects.links.map((link, i) => (
-                                    <Button
-                                        key={i}
-                                        variant={link.active ? 'default' : 'outline'}
-                                        size="sm"
-                                        disabled={!link.url}
-                                        asChild={!!link.url}
-                                    >
-                                        {link.url ? (
-                                            <Link href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        ) : (
-                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        )}
-                                    </Button>
-                                ))}
-                            </div>
+                            <Pagination className="mt-4">
+                                <PaginationContent>
+                                    {projects.current_page > 1 && (
+                                        <PaginationItem>
+                                            <PaginationPrevious
+                                                href={projects.links[0]?.url || '#'}
+                                            />
+                                        </PaginationItem>
+                                    )}
+                                    {projects.links.slice(1, -1).map((link, i) => (
+                                        <PaginationItem key={i}>
+                                            <PaginationLink
+                                                href={link.url || '#'}
+                                                isActive={link.active}
+                                            >
+                                                {link.label}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    {projects.current_page < projects.last_page && (
+                                        <PaginationItem>
+                                            <PaginationNext
+                                                href={projects.links[projects.links.length - 1]?.url || '#'}
+                                            />
+                                        </PaginationItem>
+                                    )}
+                                </PaginationContent>
+                            </Pagination>
                         )}
                     </CardContent>
                 </Card>

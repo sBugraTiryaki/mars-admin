@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\PublicProjectController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,5 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::resource('units', UnitController::class);
 });
+
+// Public project view (no auth required)
+Route::get('/p/{project:slug}', [PublicProjectController::class, 'show'])->name('public.project.show');
 
 require __DIR__.'/settings.php';
