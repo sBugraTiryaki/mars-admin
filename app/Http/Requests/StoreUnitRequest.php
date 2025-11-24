@@ -17,7 +17,7 @@ class StoreUnitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
+            'project_id' => ['nullable', 'exists:projects,id'],
             'unit_number' => ['required', 'string', 'max:255'],
             'name' => ['nullable', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:studio,1br,2br,3br,4br,5br,penthouse,duplex,townhouse,villa'],
