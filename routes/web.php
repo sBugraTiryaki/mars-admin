@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicProjectController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -20,6 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::post('projects/{project}/images', [ProjectController::class, 'uploadImages'])->name('projects.images.upload');
     Route::delete('projects/{project}/images', [ProjectController::class, 'deleteImage'])->name('projects.images.delete');
+
+    Route::resource('users', UserController::class);
 
     // Unit management within projects
     Route::post('projects/{project}/units', [\App\Http\Controllers\UnitController::class, 'storeForProject'])->name('projects.units.store');

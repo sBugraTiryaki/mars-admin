@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as projectsIndex } from '@/actions/App/Http/Controllers/ProjectController';
+import { index as usersIndex } from '@/actions/App/Http/Controllers/UserController';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Building2, Folder, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -27,6 +28,11 @@ const mainNavItems: NavItem[] = [
         title: 'Projects',
         href: projectsIndex(),
         icon: Building2,
+    },
+    {
+        title: 'Users',
+        href: usersIndex(),
+        icon: Users,
     },
 ];
 

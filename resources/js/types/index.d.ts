@@ -30,6 +30,14 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export interface Role {
+    id: number;
+    name: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -39,6 +47,7 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    roles?: Role[];
     [key: string]: unknown;
 }
 
