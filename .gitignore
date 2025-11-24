@@ -30,3 +30,6 @@ yarn-error.log
 # Project exclude paths
 /storage/app/
 /storage/framework/
+/.mcp.json
+/boost.json
+/CLAUDE.md
