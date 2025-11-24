@@ -4,7 +4,7 @@ Real estate management system for Mars International properties. Built with Lara
 
 ## Project Overview
 
-Mars International Admin is a property management platform that allows real estate portfolio managers and sales teams to manage projects and units with comprehensive media handling, role-based access control, and public property listings.
+Mars International Admin is a headless CMS for real estate property management. The system provides an authenticated admin panel for content management and automatically publishes content to public-facing property listing pages. Portfolio managers and sales teams manage projects and units through the admin interface, while potential buyers view properties on the public site without authentication.
 
 ### Core Functionality
 
@@ -37,9 +37,13 @@ Mars International Admin is a property management platform that allows real esta
 - Units: image galleries and floor plan uploads
 - Automatic image conversions for web optimization
 
-**Public Listings**
-- Public project pages accessible via `/p/{slug}`
-- No authentication required for viewing listings
+**CMS-to-Public Publishing**
+- Admin panel acts as a headless CMS controlling public property listings
+- Projects created/updated in admin panel automatically appear on public pages
+- `is_active` toggle controls public visibility without deleting content
+- Slug-based public URLs (`/p/{slug}`) generated from project names
+- Real-time content updates: changes in admin panel immediately reflect on public site
+- No authentication required for public property viewing
 
 ## Installation
 
@@ -47,7 +51,7 @@ Mars International Admin is a property management platform that allows real esta
 - PHP 8.2+
 - Composer
 - Node.js & npm
-- SQLite (default) or MySQL/PostgreSQL
+- MySQL
 
 ### Setup
 
@@ -63,23 +67,21 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-3. Configure database in `.env`:
-```env
-# SQLite (default)
-DB_CONNECTION=sqlite
+3. Create MySQL database:
+```bash
+mysql -u root -p
+CREATE DATABASE mars_admin;
+EXIT;
+```
 
-# Or MySQL/PostgreSQL
+4. Configure database in `.env`:
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=mars_admin
 DB_USERNAME=root
-DB_PASSWORD=
-```
-
-4. Create SQLite database file if using SQLite:
-```bash
-touch database/database.sqlite
+DB_PASSWORD=your_password
 ```
 
 5. Run migrations and seeders:
@@ -189,16 +191,65 @@ vendor/bin/pint --dirty
 - **Testing:** Pest v4 with browser testing support
 - **Dev Tools:** Laravel Pint, Pail, Sail
 
+## CMS Architecture: Admin Panel → Public View
+
+This project functions as a headless CMS where the admin panel controls all public-facing content:
+
+### Content Flow
+```
+Admin Panel (Auth Required)          Public View (No Auth)
+─────────────────────────            ──────────────────────
+
+ProjectController                →   PublicProjectController
+├── Create/Edit Projects              ├── Reads from same database
+├── Upload images                     ├── Displays hero images
+├── Set is_active=true                ├── Shows project details
+├── Generate slug                     └── Lists units with pricing
+└── Manage units
+
+Database (Single Source of Truth)
+├── projects table
+│   ├── slug → generates /p/{slug}
+│   ├── is_active → controls visibility
+│   └── is_featured → homepage priority
+└── units table → displayed on project pages
+```
+
+### How It Works
+
+1. **Admin Creates Project**: Portfolio manager logs into `/dashboard`, creates project with images and details
+2. **Automatic Slug Generation**: Project name "Sunset Villa" → slug "sunset-villa"
+3. **Public URL Created**: Instantly accessible at `/p/sunset-villa` (if `is_active=true`)
+4. **Content Synchronization**: Any edits in admin panel immediately update the public page
+5. **Visibility Control**: Toggle `is_active` to hide/show without deleting content
+6. **Media Management**: Images uploaded in admin panel automatically appear on public listings
+
+### Key Controllers
+
+**ProjectController** (Admin Panel - Auth Required)
+- Full CRUD operations on projects
+- Image upload and management
+- Unit creation within projects
+- Only accessible to authenticated users with proper roles
+
+**PublicProjectController** (Public View - No Auth)
+- Read-only access to active projects (`is_active=true`)
+- Displays project details, images, units
+- Accessible via `/p/{slug}` to anyone
+- No authentication or authorization required
+
+This separation allows complete control over what the public sees while maintaining a secure admin interface.
+
 ## Project Structure
 
 ```
 app/
 ├── Http/
 │   ├── Controllers/
-│   │   ├── ProjectController.php      # Project CRUD + image management
-│   │   ├── PublicProjectController.php # Public project pages
-│   │   ├── UnitController.php         # Unit management within projects
-│   │   └── UserController.php         # User & role management
+│   │   ├── ProjectController.php      # Admin: Project CRUD + image management
+│   │   ├── PublicProjectController.php # Public: Read-only project display
+│   │   ├── UnitController.php         # Admin: Unit management within projects
+│   │   └── UserController.php         # Admin: User & role management
 │   └── Requests/
 │       ├── StoreProjectRequest.php
 │       ├── UpdateProjectRequest.php
@@ -211,9 +262,9 @@ app/
 
 resources/js/
 ├── Pages/
-│   ├── projects/   # Project management UI
-│   ├── users/      # User management UI
-│   └── welcome.tsx # Public homepage
+│   ├── projects/   # Admin: Project management UI (auth required)
+│   ├── users/      # Admin: User management UI (auth required)
+│   └── welcome.tsx # Public: Homepage (no auth)
 └── components/     # Reusable React components
 
 database/
@@ -251,7 +302,12 @@ Key configuration:
 APP_NAME="Mars International"
 APP_URL=http://localhost:8000
 
-DB_CONNECTION=sqlite
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mars_admin
+DB_USERNAME=root
+DB_PASSWORD=your_password
 
 FILESYSTEM_DISK=public
 QUEUE_CONNECTION=database
