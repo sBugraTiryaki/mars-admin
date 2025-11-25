@@ -2,10 +2,11 @@ import { index, store } from '@/actions/App/Http/Controllers/ProjectController';
 import { type ImageFile } from '@/components/ui/image-upload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { CheckIcon } from 'lucide-react';
+import { CheckIcon, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { AmenitiesStep } from './components/steps/AmenitiesStep';
 import { BasicInfoStep } from './components/steps/BasicInfoStep';
@@ -65,7 +66,6 @@ export default function ProjectCreate() {
         rental_guarantee_years: '',
         rental_guarantee_rate: '',
         has_buyback_guarantee: false,
-        buyback_guarantee_rate: '',
         is_government_housing: false,
         has_title_deed: true,
         unit_type: '',
@@ -151,13 +151,28 @@ export default function ProjectCreate() {
             }
         });
 
+        console.log('Submitting project with data:', {
+            projectData,
+            units: units.length,
+            amenities: amenities.length,
+            heroImages: heroImages.length,
+            galleryImages: galleryImages.length,
+        });
+
         router.post(store().url, formData, {
             forceFormData: true,
             onError: (errors) => {
+                console.error('Project creation errors:', errors);
                 setErrors(errors);
                 setProcessing(false);
+                // Scroll to top to show errors
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
             onSuccess: () => {
+                console.log('Project created successfully');
+                setProcessing(false);
+            },
+            onFinish: () => {
                 setProcessing(false);
             },
         });
@@ -186,6 +201,23 @@ export default function ProjectCreate() {
             <Head title="Proje Oluştur" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <h1 className="text-2xl font-bold">Yeni Proje Oluştur</h1>
+
+                {/* Error Display */}
+                {Object.keys(errors).length > 0 && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Hata</AlertTitle>
+                        <AlertDescription>
+                            <ul className="list-disc list-inside">
+                                {Object.entries(errors).map(([key, value]) => (
+                                    <li key={key}>
+                                        {key}: {value}
+                                    </li>
+                                ))}
+                            </ul>
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 {/* Step Indicator */}
                 <nav aria-label="Progress">

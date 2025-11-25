@@ -149,24 +149,6 @@ export function DetailsStep({ projectData, updateProjectData, errors }: StepProp
                         Geri Satın Alma Garantisi Var
                     </Label>
                 </div>
-                {projectData.has_buyback_guarantee && (
-                    <div className="grid gap-4 md:grid-cols-1 pl-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="buyback_guarantee_rate">Geri Satın Alma Oranı (%) *</Label>
-                            <Input
-                                id="buyback_guarantee_rate"
-                                type="number"
-                                step="0.01"
-                                value={projectData.buyback_guarantee_rate}
-                                onChange={(e) => updateProjectData('buyback_guarantee_rate', e.target.value)}
-                                placeholder="Örn: 120"
-                                min="0"
-                                required={projectData.has_buyback_guarantee}
-                            />
-                            <InputError message={errors.buyback_guarantee_rate} />
-                        </div>
-                    </div>
-                )}
             </div>
 
             <Separator />

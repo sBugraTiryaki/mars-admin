@@ -23,7 +23,6 @@ export interface ProjectFormData {
     rental_guarantee_years: string;
     rental_guarantee_rate: string;
     has_buyback_guarantee: boolean;
-    buyback_guarantee_rate: string;
     is_government_housing: boolean;
     has_title_deed: boolean;
 
