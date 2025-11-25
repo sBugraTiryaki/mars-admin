@@ -1,10 +1,11 @@
 interface LocationProps {
+    isRTL?: boolean;
     t: any;
     location: string;
     city: string;
 }
 
-export function Location({ location, city, t }: LocationProps) {
+export function Location({ location, city, t, isRTL = false }: LocationProps) {
     const locationLabel = `${location}, ${city}`;
 
     return (

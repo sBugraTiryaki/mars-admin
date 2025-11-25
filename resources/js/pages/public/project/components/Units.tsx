@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { type Unit } from '@/types';
 
 interface UnitsProps {
+    isRTL?: boolean;
     t: any;
     units: Unit[];
     onSelectUnit: (unit: Unit) => void;
@@ -10,7 +11,7 @@ interface UnitsProps {
     getUnitTypeLabel: (type: Unit['type']) => string;
 }
 
-export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel, t }: UnitsProps) {
+export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel, t, isRTL = false }: UnitsProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(1);
 
@@ -68,7 +69,9 @@ export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel, t }:
                         <div
                             className="flex transition-transform duration-700 ease-out"
                             style={{
-                                transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
+                                transform: isRTL
+                                    ? `translateX(${currentIndex * (100 / itemsPerPage)}%)`
+                                    : `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
                             }}
                         >
                             {activeUnits.map((unit) => (
@@ -136,17 +139,17 @@ export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel, t }:
                     {activeUnits.length > itemsPerPage && (
                         <>
                             <button
-                                onClick={prevSlide}
-                                className="absolute top-1/2 -left-4 md:-left-10 transform -translate-y-1/2 p-3 bg-white border border-gray-200 text-gray-900 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:border-amber-500 hover:text-amber-500"
+                                onClick={isRTL ? nextSlide : prevSlide}
+                                className={`absolute top-1/2 transform -translate-y-1/2 p-3 bg-white border border-gray-200 text-gray-900 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:border-amber-500 hover:text-amber-500 ${isRTL ? '-right-4 md:-right-10' : '-left-4 md:-left-10'}`}
                             >
-                                <ChevronLeft size={20} />
+                                {isRTL ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                             </button>
 
                             <button
-                                onClick={nextSlide}
-                                className="absolute top-1/2 -right-4 md:-right-10 transform -translate-y-1/2 p-3 bg-white border border-gray-200 text-gray-900 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:border-amber-500 hover:text-amber-500"
+                                onClick={isRTL ? prevSlide : nextSlide}
+                                className={`absolute top-1/2 transform -translate-y-1/2 p-3 bg-white border border-gray-200 text-gray-900 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:border-amber-500 hover:text-amber-500 ${isRTL ? '-left-4 md:-left-10' : '-right-4 md:-right-10'}`}
                             >
-                                <ChevronRight size={20} />
+                                {isRTL ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                             </button>
                         </>
                     )}

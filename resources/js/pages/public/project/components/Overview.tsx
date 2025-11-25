@@ -1,13 +1,14 @@
 import { type Project } from '@/types';
 
 interface OverviewProps {
+    isRTL?: boolean;
     project: Project;
     formatPrice: (price: string | null, currency: string) => string;
     getStatusLabel: (status: Project['status']) => string;
     t: any;
 }
 
-export function Overview({ project, formatPrice, getStatusLabel, t }: OverviewProps) {
+export function Overview({ project, formatPrice, getStatusLabel, t, isRTL = false }: OverviewProps) {
     const stats = [
         { label: t.developer, value: project.developer || '-' },
         { label: t.status, value: getStatusLabel(project.status) },

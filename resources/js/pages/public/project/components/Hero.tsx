@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 
 interface HeroProps {
+    isRTL?: boolean;
     images: string[];
     onInquire: () => void;
     t: any;
 }
 
-export function Hero({ images, onInquire, t }: HeroProps) {
+export function Hero({ images, onInquire, t, isRTL = false }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const handleDiscover = () => {

@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { type Unit } from '@/types';
 
 interface UnitModalProps {
+    isRTL?: boolean;
     unit: Unit | null;
     isOpen: boolean;
     onClose: () => void;
@@ -21,6 +22,7 @@ export function UnitModal({
     getUnitTypeLabel,
     getViewLabel,
     t,
+    isRTL = false,
 }: UnitModalProps) {
     if (!isOpen || !unit) return null;
 

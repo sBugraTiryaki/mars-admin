@@ -24,6 +24,81 @@ interface Props {
 
 // Translation helper
 const translations = {
+    ar: {
+        overview: 'نظرة عامة',
+        gallery: 'معرض الصور',
+        amenities: 'المرافق',
+        availableUnits: 'الوحدات المتاحة',
+        location: 'الموقع',
+        contact: 'اتصل بنا',
+        inquire: 'استفسر',
+        explore: 'استكشف',
+        developer: 'المطور',
+        status: 'الحالة',
+        completion: 'تاريخ الإنجاز',
+        priceRange: 'نطاق السعر',
+        totalUnits: 'إجمالي الوحدات',
+        bedroom: 'غرفة نوم',
+        bedrooms: 'غرف نوم',
+        bathroom: 'حمام',
+        bathrooms: 'حمامات',
+        floor: 'الطابق',
+        sqft: 'قدم مربع',
+        size: 'المساحة',
+        viewDetails: 'عرض التفاصيل',
+        with: 'مع',
+        and: 'و',
+        bed: 'غرفة نوم',
+        bath: 'حمام',
+        from: 'من',
+        view: 'الإطلالة',
+        floorPlan: 'مخطط الطابق',
+        prospectus: 'النشرة التعريفية',
+        features: 'المميزات',
+        balcony: 'شرفة',
+        parking: 'موقف سيارات',
+        spots: 'مواقف',
+        sqm: 'متر مربع',
+        noImagesAvailable: 'لا توجد صور متاحة',
+        byInvitationOnly: 'بالدعوة فقط',
+        forThoseWhoSeek: 'لأولئك الذين يبحثون عن أكثر من مجرد سكن.',
+        allRightsReserved: 'جميع الحقوق محفوظة',
+        developedWithPrecision: 'تم التطوير بدقة',
+        statusLabels: {
+            planning: 'قيد التخطيط',
+            under_construction: 'قيد الإنشاء',
+            completed: 'مكتمل',
+            sold_out: 'نفذت الكمية',
+        },
+        unitTypes: {
+            studio: 'استوديو',
+            '1br': 'غرفة نوم واحدة',
+            '2br': 'غرفتا نوم',
+            '3br': '3 غرف نوم',
+            '4br': '4 غرف نوم',
+            '5br': '5 غرف نوم',
+            penthouse: 'بنتهاوس',
+            duplex: 'دوبلكس',
+            townhouse: 'تاون هاوس',
+            villa: 'فيلا',
+        },
+        viewTypes: {
+            sea: 'إطلالة على البحر',
+            city: 'إطلالة على المدينة',
+            garden: 'إطلالة على الحديقة',
+            pool: 'إطلالة على المسبح',
+            park: 'إطلالة على الحديقة العامة',
+            marina: 'إطلالة على المرسى',
+            golf: 'إطلالة على ملعب الجولف',
+            other: 'أخرى',
+        },
+        unitStatus: {
+            available: 'متاح',
+            reserved: 'محجوز',
+            sold: 'مباع',
+            rented: 'مؤجر',
+        },
+    },
     tr: {
         overview: 'Genel Bakış',
         gallery: 'Galeri',
@@ -177,8 +252,9 @@ const translations = {
 };
 
 export default function PublicProjectShow({ project }: Props) {
-    const locale = (project.current_locale || 'tr') as 'tr' | 'en';
+    const locale = (project.current_locale || 'tr') as 'tr' | 'en' | 'ar';
     const t = translations[locale];
+    const isRTL = locale === 'ar';
     const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
     const [unitModalOpen, setUnitModalOpen] = useState(false);
     const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
@@ -233,26 +309,28 @@ export default function PublicProjectShow({ project }: Props) {
         <>
             <Head title={project.name} />
 
-            <div className="min-h-screen bg-white">
-                <Header projectName={project.name} onInquire={handleOpenInquiry} t={t} />
+            <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+                <Header projectName={project.name} onInquire={handleOpenInquiry} t={t} isRTL={isRTL} />
 
                 <main>
                     <Hero
                         images={heroImages}
                         onInquire={handleOpenInquiry}
                         t={t}
+                        isRTL={isRTL}
                     />
                     <Overview
                         project={project}
                         formatPrice={formatPrice}
                         getStatusLabel={getStatusLabel}
                         t={t}
+                        isRTL={isRTL}
                     />
                     {galleryImages.length > 0 && (
-                        <Gallery images={galleryImages} projectName={project.name} t={t} />
+                        <Gallery images={galleryImages} projectName={project.name} t={t} isRTL={isRTL} />
                     )}
                     {project.amenities && project.amenities.length > 0 && (
-                        <Amenities amenities={project.amenities} t={t} />
+                        <Amenities amenities={project.amenities} t={t} isRTL={isRTL} />
                     )}
                     {project.units && project.units.length > 0 && (
                         <Units
@@ -261,17 +339,19 @@ export default function PublicProjectShow({ project }: Props) {
                             formatPrice={formatPrice}
                             getUnitTypeLabel={getUnitTypeLabel}
                             t={t}
+                            isRTL={isRTL}
                         />
                     )}
                     <Location
                         location={project.location}
                         city={project.city}
                         t={t}
+                        isRTL={isRTL}
                     />
-                    <Contact onInquire={handleOpenInquiry} t={t} />
+                    <Contact onInquire={handleOpenInquiry} t={t} isRTL={isRTL} />
                 </main>
 
-                <Footer projectName={project.name} t={t} />
+                <Footer projectName={project.name} t={t} isRTL={isRTL} />
 
                 <InquiryModal
                     isOpen={inquiryModalOpen}
@@ -288,6 +368,7 @@ export default function PublicProjectShow({ project }: Props) {
                     getUnitTypeLabel={getUnitTypeLabel}
                     getViewLabel={getViewLabel}
                     t={t}
+                    isRTL={isRTL}
                 />
             </div>
         </>

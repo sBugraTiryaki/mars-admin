@@ -11,7 +11,7 @@ class PublicProjectController extends Controller
     public function show(string $locale, Project $project): Response
     {
         // Validate locale
-        if (! in_array($locale, ['tr', 'en'])) {
+        if (! in_array($locale, ['tr', 'en', 'ar'])) {
             abort(404);
         }
 

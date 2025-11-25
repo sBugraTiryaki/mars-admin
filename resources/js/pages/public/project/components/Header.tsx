@@ -5,9 +5,10 @@ interface HeaderProps {
     t: any;
     projectName: string;
     onInquire: () => void;
+    isRTL?: boolean;
 }
 
-export function Header({ projectName, onInquire, t }: HeaderProps) {
+export function Header({ projectName, onInquire, t, isRTL = false }: HeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -45,7 +46,7 @@ export function Header({ projectName, onInquire, t }: HeaderProps) {
                 </h1>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center space-x-10">
+                <nav className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-10`}>
                     {navLinks.map((link) => (
                         <a
                             key={link.href}

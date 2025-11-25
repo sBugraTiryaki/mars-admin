@@ -40,9 +40,9 @@ Route::get('/p/{project:slug}', function (App\Models\Project $project) {
     return redirect()->route('public.project.show', ['locale' => 'tr', 'project' => $project->slug]);
 });
 
-// Language-specific routes: /p/tr/slug or /p/en/slug
+// Language-specific routes: /p/tr/slug, /p/en/slug, or /p/ar/slug
 Route::get('/p/{locale}/{project:slug}', [PublicProjectController::class, 'show'])
-    ->where('locale', 'tr|en')
+    ->where('locale', 'tr|en|ar')
     ->name('public.project.show');
 
 require __DIR__.'/settings.php';
