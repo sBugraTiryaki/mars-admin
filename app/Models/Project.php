@@ -13,22 +13,53 @@ class Project extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
     use HasFactory;
+
     use InteractsWithMedia;
 
     protected $fillable = [
         'name',
         'slug',
+        'public_name',
         'description',
+        'overview',
         'location',
         'city',
         'country',
+        'citizenship_eligibility',
+        'district',
+        'neighborhood',
+        'street',
+        'building_no',
+        'address_details',
         'total_units',
         'min_price',
         'max_price',
         'currency',
         'status',
         'completion_date',
+        'delivery_status',
         'developer',
+        'construction_company',
+        'marketing_company',
+        'has_rental_guarantee',
+        'rental_guarantee_years',
+        'rental_guarantee_rate',
+        'has_buyback_guarantee',
+        'buyback_guarantee_rate',
+        'is_government_housing',
+        'has_title_deed',
+        'unit_type',
+        'project_type',
+        'view_type',
+        'payment_plan',
+        'down_payment_amount',
+        'installment_months',
+        'vat_included',
+        'vat_rate',
+        'commission_included',
+        'commission_rate',
+        'hero_title',
+        'hero_subtitle',
         'amenities',
         'images',
         'cover_image',
@@ -46,9 +77,20 @@ class Project extends Model implements HasMedia
             'images' => 'array',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
+            'has_rental_guarantee' => 'boolean',
+            'has_buyback_guarantee' => 'boolean',
+            'is_government_housing' => 'boolean',
+            'has_title_deed' => 'boolean',
+            'vat_included' => 'boolean',
+            'commission_included' => 'boolean',
             'completion_date' => 'date',
             'min_price' => 'decimal:2',
             'max_price' => 'decimal:2',
+            'rental_guarantee_rate' => 'decimal:2',
+            'buyback_guarantee_rate' => 'decimal:2',
+            'down_payment_amount' => 'decimal:2',
+            'vat_rate' => 'decimal:2',
+            'commission_rate' => 'decimal:2',
         ];
     }
 
@@ -58,6 +100,14 @@ class Project extends Model implements HasMedia
     public function units(): HasMany
     {
         return $this->hasMany(Unit::class);
+    }
+
+    /**
+     * @return HasMany<ProjectAmenity, $this>
+     */
+    public function projectAmenities(): HasMany
+    {
+        return $this->hasMany(ProjectAmenity::class)->orderBy('order');
     }
 
     public function registerMediaCollections(): void

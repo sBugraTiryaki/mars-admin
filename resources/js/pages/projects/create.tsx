@@ -53,10 +53,12 @@ interface UnitData {
 const steps = [
     { id: 1, name: 'Basic Info', description: 'Project details' },
     { id: 2, name: 'Location', description: 'Address and location' },
-    { id: 3, name: 'Pricing', description: 'Price range and status' },
-    { id: 4, name: 'Images', description: 'Hero and gallery images' },
-    { id: 5, name: 'Units', description: 'Add units to project' },
-    { id: 6, name: 'Review', description: 'Review and submit' },
+    { id: 3, name: 'Details', description: 'Type, guarantees & payment' },
+    { id: 4, name: 'Pricing', description: 'Price range and status' },
+    { id: 5, name: 'Amenities', description: 'Project amenities' },
+    { id: 6, name: 'Images', description: 'Hero and gallery images' },
+    { id: 7, name: 'Units', description: 'Add units to project' },
+    { id: 8, name: 'Review', description: 'Review and submit' },
 ];
 
 export default function ProjectCreate() {

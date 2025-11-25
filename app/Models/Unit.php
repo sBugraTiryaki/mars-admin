@@ -13,6 +13,7 @@ class Unit extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\UnitFactory> */
     use HasFactory;
+
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -23,9 +24,13 @@ class Unit extends Model implements HasMedia
         'floor',
         'size_sqft',
         'size_sqm',
+        'min_size_sqm',
+        'max_size_sqm',
         'bedrooms',
         'bathrooms',
         'price',
+        'min_price',
+        'max_price',
         'currency',
         'status',
         'view',
@@ -51,8 +56,12 @@ class Unit extends Model implements HasMedia
             'has_parking' => 'boolean',
             'is_active' => 'boolean',
             'price' => 'decimal:2',
+            'min_price' => 'decimal:2',
+            'max_price' => 'decimal:2',
             'size_sqft' => 'decimal:2',
             'size_sqm' => 'decimal:2',
+            'min_size_sqm' => 'decimal:2',
+            'max_size_sqm' => 'decimal:2',
         ];
     }
 
