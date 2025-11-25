@@ -41,13 +41,24 @@ interface UnitData {
     type: string;
     floor: string;
     size_sqft: string;
+    min_size_sqm: string;
+    max_size_sqm: string;
     bedrooms: number;
     bathrooms: number;
     price: string;
+    min_price: string;
+    max_price: string;
     status: string;
     view: string;
     has_balcony: boolean;
     has_parking: boolean;
+}
+
+interface AmenityData {
+    id: string;
+    key: string;
+    value: string;
+    order: number;
 }
 
 const steps = [
