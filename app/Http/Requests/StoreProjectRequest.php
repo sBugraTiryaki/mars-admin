@@ -28,6 +28,14 @@ class StoreProjectRequest extends FormRequest
                 $this->merge(['units' => $units]);
             }
         }
+
+        // Decode project_amenities JSON string if provided
+        if ($this->has('project_amenities') && is_string($this->project_amenities)) {
+            $amenities = json_decode($this->project_amenities, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($amenities)) {
+                $this->merge(['project_amenities' => $amenities]);
+            }
+        }
     }
 
     /**

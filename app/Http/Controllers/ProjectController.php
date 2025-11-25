@@ -61,12 +61,14 @@ class ProjectController extends Controller
             $validated = $request->validated();
             \Log::info('Validation passed', ['validated' => $validated]);
 
-            // Extract units (already decoded by prepareForValidation)
+            // Extract units and amenities (already decoded by prepareForValidation)
             $units = $validated['units'] ?? [];
+            $projectAmenities = $validated['project_amenities'] ?? [];
 
             // Remove fields that shouldn't be saved directly to project
             $projectData = collect($validated)->except([
                 'units',
+                'project_amenities',
                 'hero_images',
                 'gallery_images',
             ])->toArray();
@@ -93,6 +95,13 @@ class ProjectController extends Controller
                 foreach ($request->file('gallery_images') as $image) {
                     $project->addMedia($image)
                         ->toMediaCollection('gallery');
+                }
+            }
+
+            // Create project amenities
+            if (! empty($projectAmenities)) {
+                foreach ($projectAmenities as $amenityData) {
+                    $project->projectAmenities()->create($amenityData);
                 }
             }
 
