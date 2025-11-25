@@ -71,6 +71,15 @@ class ProjectController extends Controller
                 'project_amenities',
                 'hero_images',
                 'gallery_images',
+                'overview_tr',
+                'overview_en',
+                'overview_ar',
+                'hero_title_tr',
+                'hero_title_en',
+                'hero_title_ar',
+                'hero_subtitle_tr',
+                'hero_subtitle_en',
+                'hero_subtitle_ar',
             ])->toArray();
 
             // Set default values if not provided

@@ -162,6 +162,13 @@ export default function ProjectCreate() {
             galleryImages: galleryImages.length,
         });
 
+        // Debug: Log all FormData entries
+        const formDataEntries: Record<string, any> = {};
+        formData.forEach((value, key) => {
+            formDataEntries[key] = value instanceof File ? `File: ${value.name}` : value;
+        });
+        console.log('FormData entries:', formDataEntries);
+
         router.post(store().url, formData, {
             forceFormData: true,
             onError: (errors) => {

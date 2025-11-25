@@ -315,8 +315,6 @@ export default function PublicProjectShow({ project }: Props) {
                     onInquire={handleOpenInquiry}
                     t={t}
                     isRTL={isRTL}
-                    currentLocale={locale}
-                    projectSlug={project.slug}
                 />
 
                 <main>

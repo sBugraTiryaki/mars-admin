@@ -328,6 +328,12 @@ export default function ProjectShow({ project }: Props) {
                                         View Public (EN)
                                     </a>
                                 </Button>
+                                <Button variant="outline" asChild>
+                                    <a href={`/p/ar/${project.slug}`} target="_blank" rel="noopener noreferrer">
+                                        <ExternalLinkIcon className="mr-2 h-4 w-4" />
+                                        View Public (AR)
+                                    </a>
+                                </Button>
                                 <Button onClick={() => setIsEditing(true)}>
                                     <PencilIcon className="mr-2 h-4 w-4" />
                                     Edit

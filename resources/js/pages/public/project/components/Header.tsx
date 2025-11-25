@@ -6,11 +6,9 @@ interface HeaderProps {
     projectName: string;
     onInquire: () => void;
     isRTL?: boolean;
-    currentLocale?: string;
-    projectSlug?: string;
 }
 
-export function Header({ projectName, onInquire, t, isRTL = false, currentLocale = 'tr', projectSlug }: HeaderProps) {
+export function Header({ projectName, onInquire, t, isRTL = false }: HeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -29,17 +27,6 @@ export function Header({ projectName, onInquire, t, isRTL = false, currentLocale
         { name: t.availableUnits, href: '#units' },
         { name: t.location, href: '#location' },
     ];
-
-    const languages = [
-        { code: 'tr', label: 'TR', name: 'Türkçe' },
-        { code: 'en', label: 'EN', name: 'English' },
-        { code: 'ar', label: 'AR', name: 'العربية' },
-    ];
-
-    const getLanguageUrl = (langCode: string) => {
-        if (!projectSlug) return '#';
-        return `/p/${langCode}/${projectSlug}`;
-    };
 
     return (
         <header
@@ -73,29 +60,7 @@ export function Header({ projectName, onInquire, t, isRTL = false, currentLocale
                     ))}
                 </nav>
 
-                <div className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-4`}>
-                    {/* Language Switcher */}
-                    <div className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
-                        {languages.map((lang) => (
-                            <a
-                                key={lang.code}
-                                href={getLanguageUrl(lang.code)}
-                                className={`px-3 py-1 text-xs font-medium tracking-wider transition-all duration-300 ${
-                                    currentLocale === lang.code
-                                        ? isScrolled
-                                            ? 'bg-gray-900 text-white'
-                                            : 'bg-white text-gray-900'
-                                        : isScrolled
-                                          ? 'text-gray-600 hover:text-gray-900'
-                                          : 'text-white/70 hover:text-white'
-                                }`}
-                                title={lang.name}
-                            >
-                                {lang.label}
-                            </a>
-                        ))}
-                    </div>
-
+                <div className="hidden md:block">
                     <button
                         onClick={onInquire}
                         className={`px-6 py-2 border font-light text-sm tracking-wider transition-all duration-300 ${
@@ -136,25 +101,6 @@ export function Header({ projectName, onInquire, t, isRTL = false, currentLocale
                             {link.name}
                         </a>
                     ))}
-
-                    {/* Mobile Language Switcher */}
-                    <div className="flex items-center justify-center space-x-2 pt-2 border-t border-gray-200">
-                        {languages.map((lang) => (
-                            <a
-                                key={lang.code}
-                                href={getLanguageUrl(lang.code)}
-                                className={`px-4 py-2 text-xs font-medium tracking-wider transition-all ${
-                                    currentLocale === lang.code
-                                        ? 'bg-gray-900 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                                title={lang.name}
-                            >
-                                {lang.label}
-                            </a>
-                        ))}
-                    </div>
-
                     <button
                         onClick={() => {
                             onInquire();
