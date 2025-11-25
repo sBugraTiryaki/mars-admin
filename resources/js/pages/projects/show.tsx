@@ -1,5 +1,4 @@
 import { index, update } from '@/actions/App/Http/Controllers/ProjectController';
-import { show as publicShow } from '@/actions/App/Http/Controllers/PublicProjectController';
 import ImageLightbox from '@/components/image-lightbox';
 import InputError from '@/components/input-error';
 import UnitFormDialog from '@/components/unit-form-dialog';
@@ -318,9 +317,15 @@ export default function ProjectShow({ project }: Props) {
                         {!isEditing ? (
                             <>
                                 <Button variant="outline" asChild>
-                                    <a href={publicShow(project.slug).url} target="_blank" rel="noopener noreferrer">
+                                    <a href={`/p/tr/${project.slug}`} target="_blank" rel="noopener noreferrer">
                                         <ExternalLinkIcon className="mr-2 h-4 w-4" />
-                                        View Public
+                                        View Public (TR)
+                                    </a>
+                                </Button>
+                                <Button variant="outline" asChild>
+                                    <a href={`/p/en/${project.slug}`} target="_blank" rel="noopener noreferrer">
+                                        <ExternalLinkIcon className="mr-2 h-4 w-4" />
+                                        View Public (EN)
                                     </a>
                                 </Button>
                                 <Button onClick={() => setIsEditing(true)}>

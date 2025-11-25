@@ -35,6 +35,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Public project view (no auth required)
+// Default route redirects to Turkish version
+Route::get('/p/{project:slug}', function (App\Models\Project $project) {
+    return redirect()->route('public.project.show', ['locale' => 'tr', 'project' => $project->slug]);
+});
+
 // Language-specific routes: /p/tr/slug or /p/en/slug
 Route::get('/p/{locale}/{project:slug}', [PublicProjectController::class, 'show'])
     ->where('locale', 'tr|en')
