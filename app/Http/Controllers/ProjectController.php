@@ -129,6 +129,11 @@ class ProjectController extends Controller
                     'hero_title' => $validated['hero_title_en'] ?? null,
                     'hero_subtitle' => $validated['hero_subtitle_en'] ?? null,
                 ],
+                'ar' => [
+                    'overview' => $validated['overview_ar'] ?? null,
+                    'hero_title' => $validated['hero_title_ar'] ?? null,
+                    'hero_subtitle' => $validated['hero_subtitle_ar'] ?? null,
+                ],
             ];
 
             foreach ($translations as $locale => $translationData) {

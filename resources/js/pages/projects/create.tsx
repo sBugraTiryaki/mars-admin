@@ -89,10 +89,13 @@ export default function ProjectCreate() {
         hero_subtitle: '',
         overview_tr: '',
         overview_en: '',
+        overview_ar: '',
         hero_title_tr: '',
         hero_title_en: '',
+        hero_title_ar: '',
         hero_subtitle_tr: '',
         hero_subtitle_en: '',
+        hero_subtitle_ar: '',
         is_featured: false,
         is_active: true,
     });

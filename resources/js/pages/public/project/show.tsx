@@ -310,7 +310,14 @@ export default function PublicProjectShow({ project }: Props) {
             <Head title={project.name} />
 
             <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-                <Header projectName={project.name} onInquire={handleOpenInquiry} t={t} isRTL={isRTL} />
+                <Header
+                    projectName={project.name}
+                    onInquire={handleOpenInquiry}
+                    t={t}
+                    isRTL={isRTL}
+                    currentLocale={locale}
+                    projectSlug={project.slug}
+                />
 
                 <main>
                     <Hero

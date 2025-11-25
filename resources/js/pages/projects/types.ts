@@ -56,10 +56,13 @@ export interface ProjectFormData {
     // Translations
     overview_tr: string;
     overview_en: string;
+    overview_ar: string;
     hero_title_tr: string;
     hero_title_en: string;
+    hero_title_ar: string;
     hero_subtitle_tr: string;
     hero_subtitle_en: string;
+    hero_subtitle_ar: string;
 
     // Flags
     is_featured: boolean;
