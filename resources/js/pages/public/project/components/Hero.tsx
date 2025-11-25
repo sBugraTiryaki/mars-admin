@@ -28,7 +28,7 @@ export function Hero({ images, onInquire, t }: HeroProps) {
     if (images.length === 0) {
         return (
             <section className="relative h-screen flex items-center justify-center bg-gray-900">
-                <div className="text-white text-2xl">No images available</div>
+                <div className="text-white text-2xl">{t.noImagesAvailable}</div>
             </section>
         );
     }

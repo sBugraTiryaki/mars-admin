@@ -21,10 +21,10 @@ export function Header({ projectName, onInquire, t }: HeaderProps) {
     }, []);
 
     const navLinks = [
-        { name: 'Overview', href: '#overview' },
-        { name: 'Amenities', href: '#amenities' },
-        { name: 'Units', href: '#units' },
-        { name: 'Location', href: '#location' },
+        { name: t.overview, href: '#overview' },
+        { name: t.amenities, href: '#amenities' },
+        { name: t.availableUnits, href: '#units' },
+        { name: t.location, href: '#location' },
     ];
 
     return (
@@ -68,7 +68,7 @@ export function Header({ projectName, onInquire, t }: HeaderProps) {
                                 : 'border-white text-white hover:bg-white hover:text-gray-900'
                         }`}
                     >
-                        Inquire
+                        {t.inquire}
                     </button>
                 </div>
 
@@ -107,7 +107,7 @@ export function Header({ projectName, onInquire, t }: HeaderProps) {
                         }}
                         className="w-full border border-gray-900 text-gray-900 py-3 font-light tracking-wider hover:bg-gray-900 hover:text-white transition-all"
                     >
-                        Inquire Now
+                        {t.inquire}
                     </button>
                 </nav>
             </div>

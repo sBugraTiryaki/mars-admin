@@ -44,7 +44,7 @@ export function Gallery({ images, projectName, t }: GalleryProps) {
         <section id="gallery" className="py-24 md:py-32 bg-white overflow-hidden">
             <div className="container mx-auto px-6 md:px-12 relative">
                 <h2 className="text-3xl md:text-5xl font-light text-center text-gray-900 mb-16 tracking-tight">
-                    Gallery
+                    {t.gallery}
                 </h2>
 
                 <div className="relative group">

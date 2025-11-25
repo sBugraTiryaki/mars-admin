@@ -10,7 +10,7 @@ interface UnitsProps {
     getUnitTypeLabel: (type: Unit['type']) => string;
 }
 
-export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel }: UnitsProps) {
+export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel, t }: UnitsProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(1);
 
@@ -60,7 +60,7 @@ export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel }: Un
         <section id="units" className="py-24 md:py-32 bg-white overflow-hidden">
             <div className="container mx-auto px-6 md:px-12 relative">
                 <h2 className="text-3xl md:text-5xl font-light text-center text-gray-900 mb-16 tracking-tight">
-                    Residences
+                    {t.availableUnits}
                 </h2>
 
                 <div className="relative group">
@@ -112,18 +112,18 @@ export function Units({ units, onSelectUnit, formatPrice, getUnitTypeLabel }: Un
                                                 </h3>
                                                 <div className="text-gray-500 text-sm space-y-1">
                                                     <p>
-                                                        {unit.size_sqft} sqft • {unit.bedrooms} Bed • {unit.bathrooms}{' '}
-                                                        Bath
+                                                        {unit.size_sqft} {t.sqft} • {unit.bedrooms} {t.bed} • {unit.bathrooms}{' '}
+                                                        {t.bath}
                                                     </p>
-                                                    {unit.floor && <p>Floor {unit.floor}</p>}
+                                                    {unit.floor && <p>{t.floor} {unit.floor}</p>}
                                                 </div>
                                                 <p className="text-gray-700 font-light">
-                                                    From {formatPrice(unit.price, unit.currency)}
+                                                    {t.from} {formatPrice(unit.price, unit.currency)}
                                                 </p>
                                             </div>
                                             <div className="mt-6 pt-6 border-t border-gray-200">
                                                 <span className="text-xs uppercase tracking-widest font-light text-gray-500 group-hover/card:text-amber-500 transition-colors">
-                                                    Explore
+                                                    {t.explore}
                                                 </span>
                                             </div>
                                         </div>

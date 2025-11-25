@@ -44,7 +44,26 @@ const translations = {
         bathrooms: 'Banyo',
         floor: 'Kat',
         sqft: 'sqft',
+        size: 'Alan',
         viewDetails: 'Detayları Gör',
+        with: 'ile',
+        and: 've',
+        bed: 'Yatak Oda',
+        bath: 'Banyo',
+        from: 'den itibaren',
+        view: 'Manzara',
+        floorPlan: 'Kat Planı',
+        prospectus: 'Broşür',
+        features: 'Özellikler',
+        balcony: 'Balkon',
+        parking: 'Otopark',
+        spots: 'araç',
+        sqm: 'sqm',
+        noImagesAvailable: 'Görsel Mevcut Değil',
+        byInvitationOnly: 'Sadece Davetle',
+        forThoseWhoSeek: 'Sadece bir konut değil, daha fazlasını arayanlar için.',
+        allRightsReserved: 'Tüm Hakları Saklıdır',
+        developedWithPrecision: 'Hassasiyetle Geliştirildi',
         statusLabels: {
             planning: 'Planlama',
             under_construction: 'İnşaat Halinde',
@@ -100,7 +119,26 @@ const translations = {
         bathrooms: 'Bathrooms',
         floor: 'Floor',
         sqft: 'sqft',
+        size: 'Size',
         viewDetails: 'View Details',
+        with: 'with',
+        and: 'and',
+        bed: 'Bed',
+        bath: 'Bath',
+        from: 'From',
+        view: 'View',
+        floorPlan: 'Floor Plan',
+        prospectus: 'Prospectus',
+        features: 'Features',
+        balcony: 'Balcony',
+        parking: 'Parking',
+        spots: 'spots',
+        sqm: 'sqm',
+        noImagesAvailable: 'No images available',
+        byInvitationOnly: 'By Invitation Only',
+        forThoseWhoSeek: 'For those who seek more than a residence.',
+        allRightsReserved: 'All Rights Reserved',
+        developedWithPrecision: 'Developed with Precision',
         statusLabels: {
             planning: 'Planning',
             under_construction: 'Under Construction',
@@ -233,7 +271,7 @@ export default function PublicProjectShow({ project }: Props) {
                     <Contact onInquire={handleOpenInquiry} t={t} />
                 </main>
 
-                <Footer projectName={project.name} />
+                <Footer projectName={project.name} t={t} />
 
                 <InquiryModal
                     isOpen={inquiryModalOpen}
@@ -249,6 +287,7 @@ export default function PublicProjectShow({ project }: Props) {
                     formatPrice={formatPrice}
                     getUnitTypeLabel={getUnitTypeLabel}
                     getViewLabel={getViewLabel}
+                    t={t}
                 />
             </div>
         </>

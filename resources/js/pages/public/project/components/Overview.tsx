@@ -37,13 +37,21 @@ export function Overview({ project, formatPrice, getStatusLabel, t }: OverviewPr
                     <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500 mb-4">
                         {t.overview}
                     </p>
-                    <h2 className="text-3xl md:text-5xl font-light text-gray-900 mb-8 tracking-tight">
-                        Precision. Light. Permanence.
-                    </h2>
-                    <p className="max-w-2xl mx-auto text-lg text-gray-600 leading-relaxed font-light">
-                        {project.description ||
-                            'Crafted for those who recognize the quiet power of restraint. Where architecture speaks in whispers, and every detail serves a singular purpose.'}
-                    </p>
+                    {project.hero_title && (
+                        <h2 className="text-3xl md:text-5xl font-light text-gray-900 mb-8 tracking-tight">
+                            {project.hero_title}
+                        </h2>
+                    )}
+                    {project.hero_subtitle && (
+                        <p className="max-w-2xl mx-auto text-xl text-gray-500 leading-relaxed font-light mb-6">
+                            {project.hero_subtitle}
+                        </p>
+                    )}
+                    {project.overview && (
+                        <p className="max-w-2xl mx-auto text-lg text-gray-600 leading-relaxed font-light">
+                            {project.overview}
+                        </p>
+                    )}
                 </div>
 
                 <div className="border-y border-gray-200 py-12">

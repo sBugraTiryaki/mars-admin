@@ -8,10 +8,10 @@ export function Contact({ onInquire, t }: ContactProps) {
         <section className="py-32 md:py-40 bg-gray-50 text-center">
             <div className="container mx-auto px-6 md:px-12">
                 <h2 className="text-3xl md:text-5xl font-light text-gray-900 mb-6 tracking-tight">
-                    By Invitation Only
+                    {t.byInvitationOnly}
                 </h2>
                 <p className="max-w-xl mx-auto text-lg text-gray-600 mb-12 font-light leading-relaxed">
-                    For those who seek more than a residence.
+                    {t.forThoseWhoSeek}
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

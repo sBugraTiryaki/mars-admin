@@ -1,8 +1,9 @@
 interface FooterProps {
     projectName: string;
+    t: any;
 }
 
-export function Footer({ projectName }: FooterProps) {
+export function Footer({ projectName, t }: FooterProps) {
     return (
         <footer className="bg-gray-900 py-16 border-t border-gray-800">
             <div className="container mx-auto px-6 md:px-12 text-center text-gray-400">
@@ -10,9 +11,9 @@ export function Footer({ projectName }: FooterProps) {
                     {projectName.toUpperCase()}
                 </p>
                 <p className="text-sm font-light mb-2">
-                    &copy; {new Date().getFullYear()} {projectName} Development. All Rights Reserved.
+                    &copy; {new Date().getFullYear()} {projectName} Development. {t.allRightsReserved}.
                 </p>
-                <p className="text-xs font-light opacity-70">Developed with Precision</p>
+                <p className="text-xs font-light opacity-70">{t.developedWithPrecision}</p>
             </div>
         </footer>
     );

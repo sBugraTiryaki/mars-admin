@@ -9,6 +9,7 @@ interface UnitModalProps {
     formatPrice: (price: string | null, currency: string) => string;
     getUnitTypeLabel: (type: Unit['type']) => string;
     getViewLabel: (view: Unit['view']) => string;
+    t: any;
 }
 
 export function UnitModal({
@@ -19,6 +20,7 @@ export function UnitModal({
     formatPrice,
     getUnitTypeLabel,
     getViewLabel,
+    t,
 }: UnitModalProps) {
     if (!isOpen || !unit) return null;
 
@@ -45,14 +47,14 @@ export function UnitModal({
         if (unit.notes) return unit.notes;
 
         const parts: string[] = [];
-        parts.push(`${getUnitTypeLabel(unit.type)} with ${unit.size_sqft} sqft${unit.size_sqm ? ` (${unit.size_sqm} sqm)` : ''}.`);
-        parts.push(`${unit.bedrooms} bedroom(s) and ${unit.bathrooms} bathroom(s).`);
+        parts.push(`${getUnitTypeLabel(unit.type)} ${t.with} ${unit.size_sqft} ${t.sqft}${unit.size_sqm ? ` (${unit.size_sqm} ${t.sqm})` : ''}.`);
+        parts.push(`${unit.bedrooms} ${unit.bedrooms === 1 ? t.bedroom : t.bedrooms} ${t.and} ${unit.bathrooms} ${unit.bathrooms === 1 ? t.bathroom : t.bathrooms}.`);
         if (unit.view) parts.push(`${getViewLabel(unit.view)}.`);
 
         const features: string[] = [];
-        if (unit.has_balcony) features.push('Balcony');
-        if (unit.has_parking) features.push(`Parking (${unit.parking_spots} spots)`);
-        if (features.length > 0) parts.push(`Features: ${features.join(', ')}.`);
+        if (unit.has_balcony) features.push(t.balcony);
+        if (unit.has_parking) features.push(`${t.parking} (${unit.parking_spots} ${t.spots})`);
+        if (features.length > 0) parts.push(`${t.features}: ${features.join(', ')}.`);
 
         return parts.join(' ');
     };
@@ -91,33 +93,33 @@ export function UnitModal({
                         {/* Unit details */}
                         <div className="grid grid-cols-2 gap-4 border-y border-gray-200 py-6">
                             <div>
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Size</p>
-                                <p className="font-light text-gray-900">{unit.size_sqft} sqft</p>
+                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{t.size}</p>
+                                <p className="font-light text-gray-900">{unit.size_sqft} {t.sqft}</p>
                             </div>
                             <div>
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Bedrooms</p>
+                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{t.bedrooms}</p>
                                 <p className="font-light text-gray-900">{unit.bedrooms}</p>
                             </div>
                             <div>
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Bathrooms</p>
+                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{t.bathrooms}</p>
                                 <p className="font-light text-gray-900">{unit.bathrooms}</p>
                             </div>
                             {unit.floor && (
                                 <div>
-                                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Floor</p>
+                                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{t.floor}</p>
                                     <p className="font-light text-gray-900">{unit.floor}</p>
                                 </div>
                             )}
                             {unit.view && (
                                 <div>
-                                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">View</p>
+                                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{t.view}</p>
                                     <p className="font-light text-gray-900">{getViewLabel(unit.view)}</p>
                                 </div>
                             )}
                             <div>
-                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Status</p>
+                                <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{t.status}</p>
                                 <p
-                                    className={`font-light capitalize ${
+                                    className={`font-light ${
                                         unit.status === 'available'
                                             ? 'text-green-600'
                                             : unit.status === 'sold'
@@ -127,7 +129,7 @@ export function UnitModal({
                                                 : 'text-blue-600'
                                     }`}
                                 >
-                                    {unit.status}
+                                    {t.unitStatus[unit.status]}
                                 </p>
                             </div>
                         </div>
@@ -137,12 +139,12 @@ export function UnitModal({
                         {unit.floor_plan && (
                             <div>
                                 <h4 className="text-sm font-light tracking-wider mb-4 text-gray-900 border-b border-gray-200 pb-2">
-                                    Floor Plan
+                                    {t.floorPlan}
                                 </h4>
                                 <div className="bg-gray-50 border border-gray-200 p-4">
                                     <img
                                         src={unit.floor_plan}
-                                        alt="Floor plan"
+                                        alt={t.floorPlan}
                                         className="w-full h-48 object-contain"
                                     />
                                 </div>
@@ -152,7 +154,7 @@ export function UnitModal({
                         {/* CTAs */}
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                             <button className="flex-1 px-6 py-3 text-sm font-light tracking-widest text-gray-500 hover:text-gray-900 transition-colors">
-                                Prospectus
+                                {t.prospectus}
                             </button>
                             <button
                                 className="flex-1 bg-gray-900 text-white px-6 py-3 text-sm font-medium tracking-widest hover:bg-gray-800 transition-colors"
@@ -161,7 +163,7 @@ export function UnitModal({
                                     onInquire();
                                 }}
                             >
-                                Inquire
+                                {t.inquire}
                             </button>
                         </div>
                     </div>

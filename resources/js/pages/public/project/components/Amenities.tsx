@@ -60,7 +60,7 @@ export function Amenities({ amenities, t }: AmenitiesProps) {
         <section id="amenities" className="py-24 md:py-32 bg-gray-50">
             <div className="container mx-auto px-6 md:px-12">
                 <h2 className="text-3xl md:text-5xl font-light text-center text-gray-900 mb-16 tracking-tight">
-                    Amenities
+                    {t.amenities}
                 </h2>
 
                 <div
