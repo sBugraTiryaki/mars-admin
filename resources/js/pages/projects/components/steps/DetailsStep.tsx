@@ -102,7 +102,7 @@ export function DetailsStep({ projectData, updateProjectData, errors }: StepProp
                     </Label>
                 </div>
                 {projectData.has_rental_guarantee && (
-                    <div className="grid gap-4 md:grid-cols-2 pl-6">
+                    <div className="grid gap-4 md:grid-cols-1 pl-6">
                         <div className="space-y-2">
                             <Label htmlFor="rental_guarantee_years">Kira Garantisi Süresi (Yıl) *</Label>
                             <Input
@@ -115,21 +115,6 @@ export function DetailsStep({ projectData, updateProjectData, errors }: StepProp
                                 required={projectData.has_rental_guarantee}
                             />
                             <InputError message={errors.rental_guarantee_years} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="rental_guarantee_rate">Kira Garantisi Oranı (%) *</Label>
-                            <Input
-                                id="rental_guarantee_rate"
-                                type="number"
-                                step="0.01"
-                                value={projectData.rental_guarantee_rate}
-                                onChange={(e) => updateProjectData('rental_guarantee_rate', e.target.value)}
-                                placeholder="Örn: 7.5"
-                                min="0"
-                                max="100"
-                                required={projectData.has_rental_guarantee}
-                            />
-                            <InputError message={errors.rental_guarantee_rate} />
                         </div>
                     </div>
                 )}
@@ -149,6 +134,28 @@ export function DetailsStep({ projectData, updateProjectData, errors }: StepProp
                         Geri Satın Alma Garantisi Var
                     </Label>
                 </div>
+                {projectData.has_buyback_guarantee && (
+                    <div className="grid gap-4 md:grid-cols-1 pl-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="buyback_value_loss_percentage">Değer Kaybı Oranı (%) *</Label>
+                            <Input
+                                id="buyback_value_loss_percentage"
+                                type="number"
+                                step="0.01"
+                                value={projectData.buyback_value_loss_percentage}
+                                onChange={(e) => updateProjectData('buyback_value_loss_percentage', e.target.value)}
+                                placeholder="Örn: 10 (Satın alma değerinin %10'u kadar değer kaybı)"
+                                min="0"
+                                max="100"
+                                required={projectData.has_buyback_guarantee}
+                            />
+                            <InputError message={errors.buyback_value_loss_percentage} />
+                            <p className="text-xs text-muted-foreground">
+                                Geri satın alma sırasında oluşacak değer kaybı yüzdesi. Örn: %10 değer kaybı ile geri satın alınır.
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <Separator />

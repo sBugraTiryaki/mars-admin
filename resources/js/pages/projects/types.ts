@@ -21,8 +21,8 @@ export interface ProjectFormData {
     citizenship_eligibility: 'eligible' | 'not_eligible';
     has_rental_guarantee: boolean;
     rental_guarantee_years: string;
-    rental_guarantee_rate: string;
     has_buyback_guarantee: boolean;
+    buyback_value_loss_percentage: string;
     is_government_housing: boolean;
     has_title_deed: boolean;
 
