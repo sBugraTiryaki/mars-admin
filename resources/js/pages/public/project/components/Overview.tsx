@@ -4,23 +4,23 @@ interface OverviewProps {
     project: Project;
     formatPrice: (price: string | null, currency: string) => string;
     getStatusLabel: (status: Project['status']) => string;
+    t: any;
 }
 
-export function Overview({ project, formatPrice, getStatusLabel }: OverviewProps) {
+export function Overview({ project, formatPrice, getStatusLabel, t }: OverviewProps) {
     const stats = [
-        { label: 'Type', value: 'Residential' },
-        { label: 'Status', value: getStatusLabel(project.status) },
-        { label: 'Developer', value: project.developer || '-' },
-        { label: 'Total Units', value: project.total_units.toString() },
+        { label: t.developer, value: project.developer || '-' },
+        { label: t.status, value: getStatusLabel(project.status) },
+        { label: t.totalUnits, value: project.total_units.toString() },
         {
-            label: 'Price Range',
+            label: t.priceRange,
             value:
                 project.min_price && project.max_price
                     ? `${formatPrice(project.min_price, project.currency)} - ${formatPrice(project.max_price, project.currency)}`
                     : '-',
         },
         {
-            label: 'Completion',
+            label: t.completion,
             value: project.completion_date
                 ? new Date(project.completion_date).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -35,7 +35,7 @@ export function Overview({ project, formatPrice, getStatusLabel }: OverviewProps
             <div className="container mx-auto px-6 md:px-12">
                 <div className="text-center mb-20">
                     <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500 mb-4">
-                        Overview
+                        {t.overview}
                     </p>
                     <h2 className="text-3xl md:text-5xl font-light text-gray-900 mb-8 tracking-tight">
                         Precision. Light. Permanence.

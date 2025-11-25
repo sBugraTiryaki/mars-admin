@@ -1,8 +1,9 @@
 interface ContactProps {
+    t: any;
     onInquire: () => void;
 }
 
-export function Contact({ onInquire }: ContactProps) {
+export function Contact({ onInquire, t }: ContactProps) {
     return (
         <section className="py-32 md:py-40 bg-gray-50 text-center">
             <div className="container mx-auto px-6 md:px-12">

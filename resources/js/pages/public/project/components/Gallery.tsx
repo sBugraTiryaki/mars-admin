@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface GalleryProps {
+    t: any;
     images: string[];
     projectName: string;
 }
 
-export function Gallery({ images, projectName }: GalleryProps) {
+export function Gallery({ images, projectName, t }: GalleryProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(1);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);

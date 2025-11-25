@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { type Unit } from '@/types';
 
 interface UnitsProps {
+    t: any;
     units: Unit[];
     onSelectUnit: (unit: Unit) => void;
     formatPrice: (price: string | null, currency: string) => string;

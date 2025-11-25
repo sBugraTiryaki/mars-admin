@@ -1,9 +1,10 @@
 interface LocationProps {
+    t: any;
     location: string;
     city: string;
 }
 
-export function Location({ location, city }: LocationProps) {
+export function Location({ location, city, t }: LocationProps) {
     const locationLabel = `${location}, ${city}`;
 
     return (

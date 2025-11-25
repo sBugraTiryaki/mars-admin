@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 interface AmenitiesProps {
+    t: any;
     amenities: string[];
 }
 
@@ -47,7 +48,7 @@ const amenityIcons: Record<string, LucideIcon> = {
     'Children Area': Baby,
 };
 
-export function Amenities({ amenities }: AmenitiesProps) {
+export function Amenities({ amenities, t }: AmenitiesProps) {
     if (amenities.length === 0) return null;
 
     const amenityItems = amenities.map((name) => ({

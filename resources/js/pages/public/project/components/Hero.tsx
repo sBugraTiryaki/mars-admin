@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 interface HeroProps {
     images: string[];
     onInquire: () => void;
+    t: any;
 }
 
-export function Hero({ images, onInquire }: HeroProps) {
+export function Hero({ images, onInquire, t }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const handleDiscover = () => {
@@ -59,13 +60,13 @@ export function Hero({ images, onInquire }: HeroProps) {
                         onClick={handleDiscover}
                         className="px-6 py-3 text-sm font-light tracking-widest text-white/80 hover:text-white transition-colors"
                     >
-                        Explore
+                        {t.explore}
                     </button>
                     <button
                         onClick={onInquire}
                         className="bg-white text-gray-900 px-8 py-3 text-sm font-medium tracking-widest hover:bg-gray-100 transition-colors"
                     >
-                        Inquire
+                        {t.inquire}
                     </button>
                 </div>
             </div>

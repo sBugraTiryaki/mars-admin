@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 interface HeaderProps {
+    t: any;
     projectName: string;
     onInquire: () => void;
 }
 
-export function Header({ projectName, onInquire }: HeaderProps) {
+export function Header({ projectName, onInquire, t }: HeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
