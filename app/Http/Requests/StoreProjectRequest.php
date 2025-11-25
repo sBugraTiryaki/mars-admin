@@ -36,6 +36,20 @@ class StoreProjectRequest extends FormRequest
                 $this->merge(['project_amenities' => $amenities]);
             }
         }
+
+        // Convert empty strings to null for nullable fields in units
+        if ($this->has('units') && is_array($this->units)) {
+            $units = $this->units;
+            foreach ($units as $key => $unit) {
+                $nullableFields = ['floor', 'size_sqft', 'size_sqm', 'min_size_sqm', 'max_size_sqm', 'price', 'min_price', 'max_price', 'parking_spots', 'view', 'notes', 'name'];
+                foreach ($nullableFields as $field) {
+                    if (isset($unit[$field]) && $unit[$field] === '') {
+                        $units[$key][$field] = null;
+                    }
+                }
+            }
+            $this->merge(['units' => $units]);
+        }
     }
 
     /**

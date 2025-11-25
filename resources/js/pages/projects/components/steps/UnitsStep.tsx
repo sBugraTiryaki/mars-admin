@@ -179,14 +179,13 @@ export function UnitsStep({ units, setUnits, currency }: UnitsStepProps) {
                         <div className="space-y-2">
                             <Label htmlFor="view">Manzara</Label>
                             <Select
-                                value={newUnit.view}
+                                value={newUnit.view || undefined}
                                 onValueChange={(value) => setNewUnit({ ...newUnit, view: value })}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Seçiniz" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Yok</SelectItem>
                                     <SelectItem value="sea">Deniz</SelectItem>
                                     <SelectItem value="city">Şehir</SelectItem>
                                     <SelectItem value="garden">Bahçe</SelectItem>
