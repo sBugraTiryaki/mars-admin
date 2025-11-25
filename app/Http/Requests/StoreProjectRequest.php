@@ -141,6 +141,14 @@ class StoreProjectRequest extends FormRequest
             'units.*.parking_spots' => ['nullable', 'integer', 'min:0'],
             'units.*.notes' => ['nullable', 'string'],
             'units.*.is_active' => ['nullable', 'boolean'],
+
+            // Translations
+            'overview_tr' => ['nullable', 'string'],
+            'overview_en' => ['nullable', 'string'],
+            'hero_title_tr' => ['nullable', 'string', 'max:255'],
+            'hero_title_en' => ['nullable', 'string', 'max:255'],
+            'hero_subtitle_tr' => ['nullable', 'string'],
+            'hero_subtitle_en' => ['nullable', 'string'],
         ];
     }
 }

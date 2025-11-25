@@ -78,38 +78,91 @@ export function BasicInfoStep({ projectData, updateProjectData, errors }: StepPr
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="overview">Proje Hakkında (Overview)</Label>
+                <Label htmlFor="overview">Proje Hakkında (Overview) - Varsayılan</Label>
                 <Textarea
                     id="overview"
                     className="min-h-[150px]"
                     value={projectData.overview}
                     onChange={(e) => updateProjectData('overview', e.target.value)}
-                    placeholder="Proje hakkında detaylı bilgi, özellikler, benzersiz satış noktaları..."
+                    placeholder="Proje hakkında detaylı bilgi (varsayılan dil)"
                 />
                 <InputError message={errors.overview} />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                    <Label htmlFor="hero_title">Hero Bölüm Başlığı</Label>
-                    <Input
-                        id="hero_title"
-                        value={projectData.hero_title}
-                        onChange={(e) => updateProjectData('hero_title', e.target.value)}
-                        placeholder="Ana sayfa hero başlığı"
-                    />
-                    <InputError message={errors.hero_title} />
+            <div className="space-y-4 rounded-lg border p-4">
+                <h3 className="font-medium">Çeviriler - Translations</h3>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="overview_tr">Proje Hakkında (Türkçe)</Label>
+                        <Textarea
+                            id="overview_tr"
+                            className="min-h-[120px]"
+                            value={projectData.overview_tr}
+                            onChange={(e) => updateProjectData('overview_tr', e.target.value)}
+                            placeholder="Proje hakkında (Türkçe)"
+                        />
+                        <InputError message={errors.overview_tr} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="overview_en">About Project (English)</Label>
+                        <Textarea
+                            id="overview_en"
+                            className="min-h-[120px]"
+                            value={projectData.overview_en}
+                            onChange={(e) => updateProjectData('overview_en', e.target.value)}
+                            placeholder="About the project (English)"
+                        />
+                        <InputError message={errors.overview_en} />
+                    </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="hero_subtitle">Hero Bölüm Alt Başlığı</Label>
-                    <Textarea
-                        id="hero_subtitle"
-                        className="min-h-[60px]"
-                        value={projectData.hero_subtitle}
-                        onChange={(e) => updateProjectData('hero_subtitle', e.target.value)}
-                        placeholder="Ana sayfa hero alt başlığı"
-                    />
-                    <InputError message={errors.hero_subtitle} />
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="hero_title_tr">Hero Başlığı (Türkçe)</Label>
+                        <Input
+                            id="hero_title_tr"
+                            value={projectData.hero_title_tr}
+                            onChange={(e) => updateProjectData('hero_title_tr', e.target.value)}
+                            placeholder="Ana başlık (Türkçe)"
+                        />
+                        <InputError message={errors.hero_title_tr} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="hero_title_en">Hero Title (English)</Label>
+                        <Input
+                            id="hero_title_en"
+                            value={projectData.hero_title_en}
+                            onChange={(e) => updateProjectData('hero_title_en', e.target.value)}
+                            placeholder="Main title (English)"
+                        />
+                        <InputError message={errors.hero_title_en} />
+                    </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="hero_subtitle_tr">Hero Alt Başlık (Türkçe)</Label>
+                        <Textarea
+                            id="hero_subtitle_tr"
+                            className="min-h-[60px]"
+                            value={projectData.hero_subtitle_tr}
+                            onChange={(e) => updateProjectData('hero_subtitle_tr', e.target.value)}
+                            placeholder="Alt başlık (Türkçe)"
+                        />
+                        <InputError message={errors.hero_subtitle_tr} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="hero_subtitle_en">Hero Subtitle (English)</Label>
+                        <Textarea
+                            id="hero_subtitle_en"
+                            className="min-h-[60px]"
+                            value={projectData.hero_subtitle_en}
+                            onChange={(e) => updateProjectData('hero_subtitle_en', e.target.value)}
+                            placeholder="Subtitle (English)"
+                        />
+                        <InputError message={errors.hero_subtitle_en} />
+                    </div>
                 </div>
             </div>
         </div>

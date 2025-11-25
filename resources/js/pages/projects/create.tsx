@@ -87,6 +87,12 @@ export default function ProjectCreate() {
         total_units: 0,
         hero_title: '',
         hero_subtitle: '',
+        overview_tr: '',
+        overview_en: '',
+        hero_title_tr: '',
+        hero_title_en: '',
+        hero_subtitle_tr: '',
+        hero_subtitle_en: '',
         is_featured: false,
         is_active: true,
     });

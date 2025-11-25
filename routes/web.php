@@ -35,6 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Public project view (no auth required)
-Route::get('/p/{project:slug}', [PublicProjectController::class, 'show'])->name('public.project.show');
+// Language-specific routes: /p/tr/slug or /p/en/slug
+Route::get('/p/{locale}/{project:slug}', [PublicProjectController::class, 'show'])
+    ->where('locale', 'tr|en')
+    ->name('public.project.show');
 
 require __DIR__.'/settings.php';

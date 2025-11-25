@@ -110,6 +110,26 @@ class Project extends Model implements HasMedia
         return $this->hasMany(ProjectAmenity::class)->orderBy('order');
     }
 
+    /**
+     * @return HasMany<ProjectTranslation, $this>
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ProjectTranslation::class);
+    }
+
+    public function translation(string $locale): ?ProjectTranslation
+    {
+        return $this->translations()->where('locale', $locale)->first();
+    }
+
+    public function getTranslatedAttribute(string $attribute, string $locale): mixed
+    {
+        $translation = $this->translation($locale);
+
+        return $translation?->{$attribute} ?? $this->{$attribute};
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('hero')

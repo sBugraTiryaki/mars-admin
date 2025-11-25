@@ -117,6 +117,30 @@ class ProjectController extends Controller
                 }
             }
 
+            // Create translations
+            $translations = [
+                'tr' => [
+                    'overview' => $validated['overview_tr'] ?? null,
+                    'hero_title' => $validated['hero_title_tr'] ?? null,
+                    'hero_subtitle' => $validated['hero_subtitle_tr'] ?? null,
+                ],
+                'en' => [
+                    'overview' => $validated['overview_en'] ?? null,
+                    'hero_title' => $validated['hero_title_en'] ?? null,
+                    'hero_subtitle' => $validated['hero_subtitle_en'] ?? null,
+                ],
+            ];
+
+            foreach ($translations as $locale => $translationData) {
+                // Only create translation if at least one field has value
+                if (! empty(array_filter($translationData))) {
+                    $project->translations()->create([
+                        'locale' => $locale,
+                        ...$translationData,
+                    ]);
+                }
+            }
+
             \Log::info('Project created successfully', [
                 'project_id' => $project->id,
                 'units_count' => count($units),

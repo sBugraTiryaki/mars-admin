@@ -251,3 +251,36 @@ test('handles empty strings for numeric fields in units', function () {
     expect($unit->min_price)->toBeNull();
     expect($unit->max_price)->toBeNull();
 });
+
+test('can create project with translations', function () {
+    actingAs($this->user)
+        ->post(route('projects.store'), [
+            'name' => 'Multilingual Project',
+            'location' => 'Dubai Marina',
+            'city' => 'Dubai',
+            'overview' => 'Default overview',
+            'hero_title' => 'Default title',
+            'hero_subtitle' => 'Default subtitle',
+            'overview_tr' => 'Türkçe açıklama',
+            'hero_title_tr' => 'Türkçe başlık',
+            'hero_subtitle_tr' => 'Türkçe alt başlık',
+            'overview_en' => 'English description',
+            'hero_title_en' => 'English title',
+            'hero_subtitle_en' => 'English subtitle',
+        ])
+        ->assertRedirect(route('projects.index'));
+
+    $project = Project::where('name', 'Multilingual Project')->first();
+    expect($project)->not->toBeNull();
+    expect($project->translations)->toHaveCount(2);
+
+    $trTranslation = $project->translation('tr');
+    expect($trTranslation)->not->toBeNull();
+    expect($trTranslation->overview)->toBe('Türkçe açıklama');
+    expect($trTranslation->hero_title)->toBe('Türkçe başlık');
+
+    $enTranslation = $project->translation('en');
+    expect($enTranslation)->not->toBeNull();
+    expect($enTranslation->overview)->toBe('English description');
+    expect($enTranslation->hero_title)->toBe('English title');
+});
