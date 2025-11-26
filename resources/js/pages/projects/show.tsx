@@ -46,21 +46,6 @@ const statusLabels = {
     sold_out: 'Sold Out',
 };
 
-interface UnitFormData {
-    id?: number;
-    unit_number: string;
-    type: string;
-    floor: string;
-    size_sqft: string;
-    bedrooms: number;
-    bathrooms: number;
-    price: string;
-    status: string;
-    view: string;
-    has_balcony: boolean;
-    has_parking: boolean;
-}
-
 export default function ProjectShow({ project }: Props) {
     const [isEditing, setIsEditing] = useState(false);
     const [processing, setProcessing] = useState(false);

@@ -4,6 +4,7 @@ import { type Unit } from '@/types';
 
 interface UnitsProps {
     isRTL?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
     units: Unit[];
     onSelectUnit: (unit: Unit) => void;

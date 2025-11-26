@@ -10,6 +10,7 @@ interface UnitModalProps {
     formatPrice: (price: string | null, currency: string) => string;
     getUnitTypeLabel: (type: Unit['type']) => string;
     getViewLabel: (view: Unit['view']) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
 }
 
@@ -22,7 +23,6 @@ export function UnitModal({
     getUnitTypeLabel,
     getViewLabel,
     t,
-    isRTL = false,
 }: UnitModalProps) {
     if (!isOpen || !unit) return null;
 

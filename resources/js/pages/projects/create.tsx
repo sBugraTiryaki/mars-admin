@@ -21,6 +21,35 @@ import { UnitsStep } from './components/steps/UnitsStep';
 import { type AmenityData, type ProjectFormData, type UnitData } from './types';
 
 type DraftPayload = Project & {
+    public_name?: string;
+    overview?: string;
+    construction_company?: string;
+    marketing_company?: string;
+    district?: string;
+    neighborhood?: string;
+    street?: string;
+    building_no?: string;
+    address_details?: string;
+    citizenship_eligibility?: string;
+    has_rental_guarantee?: boolean;
+    rental_guarantee_years?: number;
+    has_buyback_guarantee?: boolean;
+    buyback_value_loss_percentage?: number;
+    is_government_housing?: boolean;
+    has_title_deed?: boolean;
+    unit_type?: string;
+    project_type?: string;
+    view_type?: string;
+    payment_plan?: string;
+    down_payment_amount?: number;
+    installment_months?: number;
+    vat_included?: boolean;
+    vat_rate?: number;
+    commission_included?: boolean;
+    commission_rate?: number;
+    delivery_status?: string;
+    hero_title?: string;
+    hero_subtitle?: string;
     project_amenities?: AmenityData[];
     units?: Array<UnitData & { id: number }>;
     translations?: Array<{ locale: string; overview?: string; hero_title?: string; hero_subtitle?: string }>;
@@ -180,24 +209,27 @@ function hydrateProjectData(draft?: DraftPayload | null): ProjectFormData {
 function hydrateUnits(draft?: DraftPayload | null): UnitData[] {
     if (!draft?.units) return [];
 
-    return draft.units.map((unit) => ({
-        id: unit.id ? unit.id.toString() : uid(),
-        unit_number: unit.unit_number ?? '',
-        type: unit.type ?? '1br',
-        floor: unit.floor?.toString() ?? '',
-        size_sqft: unit.size_sqft?.toString() ?? '',
-        min_size_sqm: (unit as any).min_size_sqm?.toString?.() ?? '',
-        max_size_sqm: (unit as any).max_size_sqm?.toString?.() ?? '',
-        bedrooms: unit.bedrooms ?? 0,
-        bathrooms: unit.bathrooms ?? 1,
-        price: unit.price?.toString() ?? '',
-        min_price: unit.min_price?.toString() ?? '',
-        max_price: unit.max_price?.toString() ?? '',
-        status: unit.status ?? 'available',
-        view: unit.view ?? '',
-        has_balcony: Boolean(unit.has_balcony),
-        has_parking: Boolean(unit.has_parking),
-    }));
+    return draft.units.map((unit) => {
+        const unitWithSize = unit as typeof unit & { min_size_sqm?: number; max_size_sqm?: number };
+        return {
+            id: unit.id ? unit.id.toString() : uid(),
+            unit_number: unit.unit_number ?? '',
+            type: unit.type ?? '1br',
+            floor: unit.floor?.toString() ?? '',
+            size_sqft: unit.size_sqft?.toString() ?? '',
+            min_size_sqm: unitWithSize.min_size_sqm?.toString() ?? '',
+            max_size_sqm: unitWithSize.max_size_sqm?.toString() ?? '',
+            bedrooms: unit.bedrooms ?? 0,
+            bathrooms: unit.bathrooms ?? 1,
+            price: unit.price?.toString() ?? '',
+            min_price: unit.min_price?.toString() ?? '',
+            max_price: unit.max_price?.toString() ?? '',
+            status: unit.status ?? 'available',
+            view: unit.view ?? '',
+            has_balcony: Boolean(unit.has_balcony),
+            has_parking: Boolean(unit.has_parking),
+        };
+    });
 }
 
 function hydrateAmenities(draft?: DraftPayload | null): AmenityData[] {
@@ -300,6 +332,7 @@ export default function ProjectCreate({ draft }: Props) {
             previousStepRef.current = currentStep;
             void handleAutoSave();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentStep, draftId]);
 
     const buildFormData = (method: 'POST' | 'PUT' = 'POST', stayOnPage = false) => {
@@ -324,11 +357,13 @@ export default function ProjectCreate({ draft }: Props) {
         formData.append('total_units', units.length.toString());
 
         if (amenities.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const amenitiesData = amenities.map(({ id, ...amenity }) => amenity);
             formData.append('project_amenities', JSON.stringify(amenitiesData));
         }
 
         if (units.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const unitsData = units.map(({ id, ...unit }) => unit);
             formData.append('units', JSON.stringify(unitsData));
         }
@@ -395,7 +430,7 @@ export default function ProjectCreate({ draft }: Props) {
             setLastSavedAt(payload?.draft?.updated_at ? new Date(payload.draft.updated_at) : new Date());
 
             return payload?.draft?.id ?? draftId;
-        } catch (error) {
+        } catch {
             setSaveError('Taslak kaydedilirken bir hata oluştu.');
             setAutoSaveState('unsaved');
             return null;
@@ -496,7 +531,7 @@ export default function ProjectCreate({ draft }: Props) {
         }
     }, [autoSaveState, lastSavedAt]);
 
-    const flashSuccess = (page.props as any)?.flash?.success;
+    const flashSuccess = (page.props as { flash?: { success?: string } })?.flash?.success;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface GalleryProps {
     isRTL?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
     images: string[];
     projectName: string;

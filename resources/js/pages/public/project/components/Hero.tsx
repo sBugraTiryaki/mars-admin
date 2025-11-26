@@ -4,10 +4,11 @@ interface HeroProps {
     isRTL?: boolean;
     images: string[];
     onInquire: () => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
 }
 
-export function Hero({ images, onInquire, t, isRTL = false }: HeroProps) {
+export function Hero({ images, onInquire, t }: HeroProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const handleDiscover = () => {

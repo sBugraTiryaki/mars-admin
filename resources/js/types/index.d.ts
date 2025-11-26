@@ -94,6 +94,8 @@ export interface Unit {
     bedrooms: number;
     bathrooms: number;
     price: string;
+    min_price?: string | null;
+    max_price?: string | null;
     currency: string;
     status: 'available' | 'reserved' | 'sold' | 'rented';
     view: 'sea' | 'city' | 'garden' | 'pool' | 'park' | 'marina' | 'golf' | 'other' | null;

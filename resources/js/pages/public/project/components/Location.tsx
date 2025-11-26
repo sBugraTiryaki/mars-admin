@@ -1,11 +1,12 @@
 interface LocationProps {
     isRTL?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
     location: string;
     city: string;
 }
 
-export function Location({ location, city, t, isRTL = false }: LocationProps) {
+export function Location({ location, city }: LocationProps) {
     const locationLabel = `${location}, ${city}`;
 
     return (

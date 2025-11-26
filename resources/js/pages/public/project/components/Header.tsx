@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 interface HeaderProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
     projectName: string;
     onInquire: () => void;

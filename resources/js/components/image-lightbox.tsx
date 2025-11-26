@@ -12,6 +12,14 @@ interface Props {
 export default function ImageLightbox({ images, initialIndex, onClose }: Props) {
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
+    const handlePrevious = () => {
+        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+    };
+
+    const handleNext = () => {
+        setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+    };
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'ArrowLeft') {
@@ -25,15 +33,8 @@ export default function ImageLightbox({ images, initialIndex, onClose }: Props) 
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentIndex]);
-
-    const handlePrevious = () => {
-        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
-    };
-
-    const handleNext = () => {
-        setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
-    };
 
     return (
         <Dialog open={true} onOpenChange={onClose}>

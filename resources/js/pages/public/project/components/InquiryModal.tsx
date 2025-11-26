@@ -6,7 +6,7 @@ interface InquiryModalProps {
     projectName: string;
 }
 
-export function InquiryModal({ isOpen, onClose, projectName }: InquiryModalProps) {
+export function InquiryModal({ isOpen, onClose }: InquiryModalProps) {
     if (!isOpen) return null;
 
     return (

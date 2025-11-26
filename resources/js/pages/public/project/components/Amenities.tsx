@@ -16,6 +16,7 @@ import {
 
 interface AmenitiesProps {
     isRTL?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
     amenities: string[];
 }
@@ -49,7 +50,7 @@ const amenityIcons: Record<string, LucideIcon> = {
     'Children Area': Baby,
 };
 
-export function Amenities({ amenities, t, isRTL = false }: AmenitiesProps) {
+export function Amenities({ amenities, t }: AmenitiesProps) {
     if (amenities.length === 0) return null;
 
     const amenityItems = amenities.map((name) => ({

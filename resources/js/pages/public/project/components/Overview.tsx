@@ -2,13 +2,14 @@ import { type Project } from '@/types';
 
 interface OverviewProps {
     isRTL?: boolean;
-    project: Project;
+    project: Project & { hero_title?: string; hero_subtitle?: string; overview?: string };
     formatPrice: (price: string | null, currency: string) => string;
     getStatusLabel: (status: Project['status']) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     t: any;
 }
 
-export function Overview({ project, formatPrice, getStatusLabel, t, isRTL = false }: OverviewProps) {
+export function Overview({ project, formatPrice, getStatusLabel, t }: OverviewProps) {
     const stats = [
         { label: t.developer, value: project.developer || '-' },
         { label: t.status, value: getStatusLabel(project.status) },
