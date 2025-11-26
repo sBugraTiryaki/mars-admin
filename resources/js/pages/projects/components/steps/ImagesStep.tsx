@@ -24,8 +24,10 @@ export function ImagesStep({
                     onChange={setHeroImages}
                     maxFiles={5}
                     label="Hero Görselleri"
-                    description="Bu görseller ana sayfada hero slider'da görüntülenecektir. Sırayı değiştirmek için sürükleyin."
+                    description="Bu görseller ana sayfada hero slider'da görüntülenecektir. Resimler otomatik olarak 16:9 oranında kırpılacaktır. Sırayı değiştirmek için sürükleyin."
                     error={errors.hero_images}
+                    enableCrop={true}
+                    cropAspectRatio={16 / 9}
                 />
             </div>
             <Separator />
@@ -35,8 +37,11 @@ export function ImagesStep({
                     onChange={setGalleryImages}
                     maxFiles={20}
                     label="Galeri Görselleri"
-                    description="Bu görseller galeri bölümünde görüntülenecektir. Sırayı değiştirmek için sürükleyin."
+                    description="Bu görseller galeri bölümünde görüntülenecektir. İstediğiniz aspect ratio'yu seçebilir veya freeform kullanabilirsiniz. Sırayı değiştirmek için sürükleyin."
                     error={errors.gallery_images}
+                    enableCrop={true}
+                    cropAspectRatio={4 / 3}
+                    allowAspectRatioChange={true}
                 />
             </div>
         </div>

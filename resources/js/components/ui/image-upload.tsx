@@ -19,6 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
+import { ImageCropper } from '../image-cropper';
 
 export interface ImageFile {
     id: string;
@@ -95,6 +96,9 @@ interface ImageUploadProps {
     error?: string;
     multiple?: boolean;
     className?: string;
+    enableCrop?: boolean;
+    cropAspectRatio?: number; // e.g., 16/9 for hero images
+    allowAspectRatioChange?: boolean; // Allow user to change aspect ratio
 }
 
 export function ImageUpload({
@@ -107,8 +111,13 @@ export function ImageUpload({
     error,
     multiple = true,
     className,
+    enableCrop = false,
+    cropAspectRatio = 16 / 9,
+    allowAspectRatioChange = false,
 }: ImageUploadProps) {
     const [isDragOver, setIsDragOver] = useState(false);
+    const [cropDialogOpen, setCropDialogOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -131,10 +140,20 @@ export function ImageUpload({
         (files: FileList | null) => {
             if (!files) return;
 
-            const newImages: ImageFile[] = [];
             const remainingSlots = maxFiles - value.length;
             const filesToProcess = Math.min(files.length, remainingSlots);
 
+            if (filesToProcess === 0) return;
+
+            // If crop is enabled, open crop dialog for the first file
+            if (enableCrop) {
+                setSelectedFile(files[0]);
+                setCropDialogOpen(true);
+                return;
+            }
+
+            // Otherwise, add files directly
+            const newImages: ImageFile[] = [];
             for (let i = 0; i < filesToProcess; i++) {
                 const file = files[i];
                 const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -148,8 +167,36 @@ export function ImageUpload({
 
             onChange([...value, ...newImages]);
         },
-        [value, onChange, maxFiles]
+        [value, onChange, maxFiles, enableCrop]
     );
+
+    const handleCropComplete = useCallback(
+        (croppedImageBlob: Blob, croppedImageUrl: string) => {
+            if (!selectedFile) return;
+
+            const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const croppedFile = new File([croppedImageBlob], selectedFile.name, {
+                type: croppedImageBlob.type,
+            });
+
+            onChange([
+                ...value,
+                {
+                    id,
+                    file: croppedFile,
+                    url: croppedImageUrl,
+                    name: selectedFile.name,
+                },
+            ]);
+
+            setSelectedFile(null);
+        },
+        [selectedFile, value, onChange]
+    );
+
+    const handleCropCancel = useCallback(() => {
+        setSelectedFile(null);
+    }, []);
 
     const handleRemove = useCallback(
         (id: string) => {
@@ -192,6 +239,19 @@ export function ImageUpload({
                         <p className="text-sm text-muted-foreground">{description}</p>
                     )}
                 </div>
+            )}
+
+            {enableCrop && selectedFile && (
+                <ImageCropper
+                    dialogOpen={cropDialogOpen}
+                    setDialogOpen={setCropDialogOpen}
+                    selectedFile={selectedFile}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                    aspectRatio={cropAspectRatio}
+                    allowAspectRatioChange={allowAspectRatioChange}
+                    triggerLabel="Crop Image"
+                />
             )}
 
             {canAddMore && (
