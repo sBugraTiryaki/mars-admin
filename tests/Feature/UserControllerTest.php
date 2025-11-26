@@ -14,7 +14,9 @@ beforeEach(function () {
     Role::firstOrCreate(['name' => 'salesperson', 'guard_name' => 'web']);
 
     // Create admin user
-    $this->adminUser = User::factory()->create();
+    $this->adminUser = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
     $this->adminUser->assignRole('admin');
 });
 
@@ -141,7 +143,8 @@ test('user index can be searched', function () {
         ->assertSuccessful()
         ->assertInertia(fn ($page) => $page
             ->component('users/index')
-            ->has('users.data', fn ($users) => $users->where('name', 'John Doe'))
+            ->has('users.data')
+            ->where('users.data.0.name', 'John Doe')
         );
 });
 
@@ -214,7 +217,7 @@ test('update user requires valid role', function () {
 });
 
 test('guests cannot access user pages', function () {
-    $this->get('/users')->assertRedirect('/');
-    $this->get('/users/create')->assertRedirect('/');
-    $this->post('/users', [])->assertRedirect('/');
+    $this->get('/users')->assertRedirect('/login');
+    $this->get('/users/create')->assertRedirect('/login');
+    $this->post('/users', [])->assertRedirect('/login');
 });

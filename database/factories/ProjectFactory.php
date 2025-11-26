@@ -45,6 +45,9 @@ class ProjectFactory extends Factory
             'cover_image' => null,
             'is_featured' => fake()->boolean(20),
             'is_active' => fake()->boolean(90),
+            'is_draft' => false,
+            'current_step' => null,
+            'created_by' => null,
         ];
     }
 

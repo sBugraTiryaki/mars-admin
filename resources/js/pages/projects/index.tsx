@@ -3,6 +3,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
     Select,
     SelectContent,
@@ -30,7 +41,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type PaginatedData, type Project } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { PlusIcon, TrashIcon, EyeIcon, GridIcon, ListIcon, SearchIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -43,6 +54,7 @@ interface Props {
     projects: PaginatedData<Project & {
         hero_images?: string[];
     }>;
+    drafts: Array<Project & { draft_hero_images?: string[]; current_step?: number | null }>;
 }
 
 const statusColors = {
@@ -50,7 +62,7 @@ const statusColors = {
     under_construction: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
     completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
     sold_out: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-};
+} as const;
 
 const statusLabels = {
     planning: 'Planning',
@@ -59,10 +71,23 @@ const statusLabels = {
     sold_out: 'Sold Out',
 };
 
-export default function ProjectsIndex({ projects }: Props) {
+const stepMap = [
+    'Temel Bilgiler',
+    'Konum',
+    'Detaylar',
+    'Fiyatlandırma',
+    'Özellikler',
+    'Görseller',
+    'Üniteler',
+    'İnceleme',
+] as const;
+
+export default function ProjectsIndex({ projects, drafts }: Props) {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [selectedDraft, setSelectedDraft] = useState<Project | null>(null);
+    const [draftToDelete, setDraftToDelete] = useState<Project | null>(null);
 
     const handleDelete = (project: Project) => {
         if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
@@ -94,6 +119,8 @@ export default function ProjectsIndex({ projects }: Props) {
             preserveScroll: true,
         });
     };
+
+    const draftCards = useMemo(() => drafts ?? [], [drafts]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -155,6 +182,76 @@ export default function ProjectsIndex({ projects }: Props) {
                         </div>
                     </CardContent>
                 </Card>
+
+                {draftCards.length > 0 && (
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle>Taslaklar</CardTitle>
+                                <p className="text-sm text-muted-foreground">Taslaklarınızı düzenlemeye devam edin veya yayınlayın.</p>
+                            </div>
+                            <Badge variant="secondary">{draftCards.length}/10</Badge>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {draftCards.map((draft) => {
+                                    const draftImage = draft.draft_hero_images?.[0] || draft.cover_image;
+                                    const stepIndex = (draft.current_step ?? 1) - 1;
+                                    const stepLabel = stepMap[stepIndex] ?? 'Adım';
+                                    const progress = ((draft.current_step ?? 1) / 8) * 100;
+
+                                    return (
+                                        <Card key={draft.id} className="overflow-hidden border-dashed">
+                                            {draftImage ? (
+                                                <div className="aspect-video w-full overflow-hidden bg-muted">
+                                                    <img
+                                                        src={draftImage}
+                                                        alt={draft.name ?? 'Taslak'}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="aspect-video w-full bg-muted flex items-center justify-center">
+                                                    <span className="text-sm text-muted-foreground">Görsel yok</span>
+                                                </div>
+                                            )}
+                                            <CardHeader className="pb-0">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div>
+                                                        <CardTitle className="text-lg">{draft.name || 'İsimsiz Proje'}</CardTitle>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {draft.city || 'Şehir Yok'}
+                                                        </p>
+                                                    </div>
+                                                    <Badge variant="outline">{draft.current_step ?? 1}/8</Badge>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">{stepLabel}</p>
+                                            </CardHeader>
+                                            <CardContent className="space-y-3">
+                                                <div>
+                                                    <Progress value={progress} />
+                                                    <p className="mt-1 text-xs text-muted-foreground">Tamamlanma: %{Math.round(progress)}</p>
+                                                </div>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button size="sm" onClick={() => setSelectedDraft(draft)}>
+                                                        Devam Et
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => setDraftToDelete(draft)}
+                                                    >
+                                                        <TrashIcon className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Grid View */}
                 {viewMode === 'grid' ? (
@@ -349,6 +446,54 @@ export default function ProjectsIndex({ projects }: Props) {
                     </Pagination>
                 )}
             </div>
+
+            <AlertDialog open={Boolean(selectedDraft)} onOpenChange={() => setSelectedDraft(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Taslağa Devam Et</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {selectedDraft?.name || 'İsimsiz Proje'} - {selectedDraft?.city || 'Şehir Yok'} <br />
+                            Adım: {selectedDraft?.current_step ?? 1}/8 {selectedDraft?.current_step ? `(${stepMap[(selectedDraft.current_step ?? 1) - 1]})` : ''}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>İptal</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                if (!selectedDraft) return;
+                                router.get(`/projects/drafts/${selectedDraft.id}/load`);
+                            }}
+                        >
+                            Devam Et
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={Boolean(draftToDelete)} onOpenChange={() => setDraftToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Taslağı sil</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this draft?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>İptal</AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={() => {
+                                if (!draftToDelete) return;
+                                router.delete(`/projects/${draftToDelete.id}`, {
+                                    preserveScroll: true,
+                                });
+                            }}
+                        >
+                            Sil
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }

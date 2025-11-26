@@ -15,8 +15,8 @@ class PublicProjectController extends Controller
             abort(404);
         }
 
-        // Only show active projects
-        if (! $project->is_active) {
+        // Only show active, published projects
+        if (! $project->is_active || $project->is_draft) {
             abort(404);
         }
 

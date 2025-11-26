@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -43,9 +45,8 @@ class Project extends Model implements HasMedia
         'marketing_company',
         'has_rental_guarantee',
         'rental_guarantee_years',
-        'rental_guarantee_rate',
         'has_buyback_guarantee',
-        'buyback_guarantee_rate',
+        'buyback_value_loss_percentage',
         'is_government_housing',
         'has_title_deed',
         'unit_type',
@@ -65,6 +66,9 @@ class Project extends Model implements HasMedia
         'cover_image',
         'is_featured',
         'is_active',
+        'is_draft',
+        'current_step',
+        'created_by',
     ];
 
     /**
@@ -86,11 +90,13 @@ class Project extends Model implements HasMedia
             'completion_date' => 'date',
             'min_price' => 'decimal:2',
             'max_price' => 'decimal:2',
-            'rental_guarantee_rate' => 'decimal:2',
-            'buyback_guarantee_rate' => 'decimal:2',
+            'buyback_value_loss_percentage' => 'decimal:2',
             'down_payment_amount' => 'decimal:2',
             'vat_rate' => 'decimal:2',
             'commission_rate' => 'decimal:2',
+            'is_draft' => 'boolean',
+            'current_step' => 'integer',
+            'created_by' => 'integer',
         ];
     }
 
@@ -118,6 +124,14 @@ class Project extends Model implements HasMedia
         return $this->hasMany(ProjectTranslation::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function translation(string $locale): ?ProjectTranslation
     {
         return $this->translations()->where('locale', $locale)->first();
@@ -136,6 +150,12 @@ class Project extends Model implements HasMedia
             ->useDisk('public');
 
         $this->addMediaCollection('gallery')
+            ->useDisk('public');
+
+        $this->addMediaCollection('draft_hero')
+            ->useDisk('public');
+
+        $this->addMediaCollection('draft_gallery')
             ->useDisk('public');
     }
 
@@ -182,5 +202,44 @@ class Project extends Model implements HasMedia
             ->map(fn (Media $media) => $media->getUrl())
             ->values()
             ->toArray();
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getDraftHeroImagesAttribute(): array
+    {
+        return $this->getMedia('draft_hero')
+            ->sortBy('order_column')
+            ->map(fn (Media $media) => $media->getUrl())
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getDraftGalleryImagesAttribute(): array
+    {
+        return $this->getMedia('draft_gallery')
+            ->sortBy('order_column')
+            ->map(fn (Media $media) => $media->getUrl())
+            ->values()
+            ->toArray();
+    }
+
+    public function scopeDrafts($query)
+    {
+        return $query->where('is_draft', true);
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('is_draft', false);
+    }
+
+    public function scopeMyDrafts($query, int $userId)
+    {
+        return $query->drafts()->where('created_by', $userId);
     }
 }

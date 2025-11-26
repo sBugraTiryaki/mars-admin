@@ -126,13 +126,13 @@ export function ReviewStep({ projectData, units, amenities }: ReviewStepProps) {
                         {projectData.has_rental_guarantee && (
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Kira Garantisi:</span>
-                                <span>{projectData.rental_guarantee_years} yıl - %{projectData.rental_guarantee_rate}</span>
+                                <span>{projectData.rental_guarantee_years} yıl</span>
                             </div>
                         )}
                         {projectData.has_buyback_guarantee && (
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Geri Satın Alma:</span>
-                                <span>%{projectData.buyback_guarantee_rate}</span>
+                                <span>%{projectData.buyback_value_loss_percentage}</span>
                             </div>
                         )}
                     </CardContent>

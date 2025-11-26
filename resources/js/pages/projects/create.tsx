@@ -1,13 +1,15 @@
-import { index, store } from '@/actions/App/Http/Controllers/ProjectController';
+import { index } from '@/actions/App/Http/Controllers/ProjectController';
 import { type ImageFile } from '@/components/ui/image-upload';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { CheckIcon, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import { type BreadcrumbItem, type Project } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { AlertCircle, CheckIcon, Clock4Icon, SaveIcon } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AmenitiesStep } from './components/steps/AmenitiesStep';
 import { BasicInfoStep } from './components/steps/BasicInfoStep';
 import { DetailsStep } from './components/steps/DetailsStep';
@@ -17,6 +19,14 @@ import { PricingStep } from './components/steps/PricingStep';
 import { ReviewStep } from './components/steps/ReviewStep';
 import { UnitsStep } from './components/steps/UnitsStep';
 import { type AmenityData, type ProjectFormData, type UnitData } from './types';
+
+type DraftPayload = Project & {
+    project_amenities?: AmenityData[];
+    units?: Array<UnitData & { id: number }>;
+    translations?: Array<{ locale: string; overview?: string; hero_title?: string; hero_subtitle?: string }>;
+    draft_hero_images?: string[];
+    draft_gallery_images?: string[];
+};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,85 +47,270 @@ const steps = [
     { id: 5, name: 'Özellikler', description: 'Proje özellikleri' },
     { id: 6, name: 'Görseller', description: 'Hero ve galeri görselleri' },
     { id: 7, name: 'Üniteler', description: 'Projeye ünite ekle' },
-    { id: 8, name: 'İnceleme', description: 'İncele ve gönder' },
+    { id: 8, name: 'İnceleme', description: 'İncele ve yayınla' },
 ];
 
-export default function ProjectCreate() {
-    const [currentStep, setCurrentStep] = useState(1);
+interface Props {
+    draft?: DraftPayload | null;
+}
+
+const defaultProjectData: ProjectFormData = {
+    name: '',
+    public_name: '',
+    description: '',
+    overview: '',
+    developer: '',
+    construction_company: '',
+    marketing_company: '',
+    location: '',
+    city: '',
+    country: 'UAE',
+    district: '',
+    neighborhood: '',
+    street: '',
+    building_no: '',
+    address_details: '',
+    citizenship_eligibility: 'eligible',
+    has_rental_guarantee: false,
+    rental_guarantee_years: '',
+    has_buyback_guarantee: false,
+    buyback_value_loss_percentage: '',
+    is_government_housing: false,
+    has_title_deed: true,
+    unit_type: '',
+    project_type: '',
+    view_type: '',
+    payment_plan: 'cash',
+    down_payment_amount: '',
+    installment_months: '',
+    vat_included: true,
+    vat_rate: '',
+    commission_included: false,
+    commission_rate: '',
+    min_price: '',
+    max_price: '',
+    currency: 'AED',
+    status: 'planning',
+    completion_date: '',
+    delivery_status: '',
+    total_units: 0,
+    hero_title: '',
+    hero_subtitle: '',
+    overview_tr: '',
+    overview_en: '',
+    overview_ar: '',
+    hero_title_tr: '',
+    hero_title_en: '',
+    hero_title_ar: '',
+    hero_subtitle_tr: '',
+    hero_subtitle_en: '',
+    hero_subtitle_ar: '',
+    is_featured: false,
+    is_active: true,
+};
+
+const uid = () =>
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+function hydrateProjectData(draft?: DraftPayload | null): ProjectFormData {
+    if (!draft) return defaultProjectData;
+
+    const getTranslation = (locale: string, field: string) =>
+        draft.translations?.find((t) => t.locale === locale)?.[field as keyof typeof draft.translations[number]] ?? '';
+
+    return {
+        ...defaultProjectData,
+        name: draft.name ?? '',
+        public_name: draft.public_name ?? '',
+        description: draft.description ?? '',
+        overview: draft.overview ?? '',
+        developer: draft.developer ?? '',
+        construction_company: draft.construction_company ?? '',
+        marketing_company: draft.marketing_company ?? '',
+        location: draft.location ?? '',
+        city: draft.city ?? '',
+        country: draft.country ?? 'UAE',
+        district: draft.district ?? '',
+        neighborhood: draft.neighborhood ?? '',
+        street: draft.street ?? '',
+        building_no: draft.building_no ?? '',
+        address_details: draft.address_details ?? '',
+        citizenship_eligibility: (draft.citizenship_eligibility as ProjectFormData['citizenship_eligibility']) ?? 'eligible',
+        has_rental_guarantee: Boolean(draft.has_rental_guarantee),
+        rental_guarantee_years: draft.rental_guarantee_years?.toString() ?? '',
+        has_buyback_guarantee: Boolean(draft.has_buyback_guarantee),
+        buyback_value_loss_percentage: draft.buyback_value_loss_percentage?.toString() ?? '',
+        is_government_housing: Boolean(draft.is_government_housing),
+        has_title_deed: Boolean(draft.has_title_deed ?? true),
+        unit_type: draft.unit_type ?? '',
+        project_type: draft.project_type ?? '',
+        view_type: draft.view_type ?? '',
+        payment_plan: (draft.payment_plan as ProjectFormData['payment_plan']) ?? 'cash',
+        down_payment_amount: draft.down_payment_amount?.toString() ?? '',
+        installment_months: draft.installment_months?.toString() ?? '',
+        vat_included: Boolean(draft.vat_included ?? true),
+        vat_rate: draft.vat_rate?.toString() ?? '',
+        commission_included: Boolean(draft.commission_included),
+        commission_rate: draft.commission_rate?.toString() ?? '',
+        min_price: draft.min_price?.toString() ?? '',
+        max_price: draft.max_price?.toString() ?? '',
+        currency: draft.currency ?? 'AED',
+        status: draft.status ?? 'planning',
+        completion_date: draft.completion_date ?? '',
+        delivery_status: draft.delivery_status ?? '',
+        total_units: draft.total_units ?? 0,
+        hero_title: draft.hero_title ?? '',
+        hero_subtitle: draft.hero_subtitle ?? '',
+        overview_tr: (getTranslation('tr', 'overview') as string) ?? '',
+        overview_en: (getTranslation('en', 'overview') as string) ?? '',
+        overview_ar: (getTranslation('ar', 'overview') as string) ?? '',
+        hero_title_tr: (getTranslation('tr', 'hero_title') as string) ?? '',
+        hero_title_en: (getTranslation('en', 'hero_title') as string) ?? '',
+        hero_title_ar: (getTranslation('ar', 'hero_title') as string) ?? '',
+        hero_subtitle_tr: (getTranslation('tr', 'hero_subtitle') as string) ?? '',
+        hero_subtitle_en: (getTranslation('en', 'hero_subtitle') as string) ?? '',
+        hero_subtitle_ar: (getTranslation('ar', 'hero_subtitle') as string) ?? '',
+        is_featured: Boolean(draft.is_featured),
+        is_active: Boolean(draft.is_active ?? true),
+    };
+}
+
+function hydrateUnits(draft?: DraftPayload | null): UnitData[] {
+    if (!draft?.units) return [];
+
+    return draft.units.map((unit) => ({
+        id: unit.id ? unit.id.toString() : uid(),
+        unit_number: unit.unit_number ?? '',
+        type: unit.type ?? '1br',
+        floor: unit.floor?.toString() ?? '',
+        size_sqft: unit.size_sqft?.toString() ?? '',
+        min_size_sqm: (unit as any).min_size_sqm?.toString?.() ?? '',
+        max_size_sqm: (unit as any).max_size_sqm?.toString?.() ?? '',
+        bedrooms: unit.bedrooms ?? 0,
+        bathrooms: unit.bathrooms ?? 1,
+        price: unit.price?.toString() ?? '',
+        min_price: unit.min_price?.toString() ?? '',
+        max_price: unit.max_price?.toString() ?? '',
+        status: unit.status ?? 'available',
+        view: unit.view ?? '',
+        has_balcony: Boolean(unit.has_balcony),
+        has_parking: Boolean(unit.has_parking),
+    }));
+}
+
+function hydrateAmenities(draft?: DraftPayload | null): AmenityData[] {
+    if (!draft?.project_amenities) return [];
+
+    return draft.project_amenities.map((amenity) => ({
+        id: amenity.id?.toString?.() ?? uid(),
+        key: amenity.key ?? '',
+        value: amenity.value ?? '',
+        order: amenity.order ?? 0,
+    }));
+}
+
+function hydrateImages(urls?: string[]): ImageFile[] {
+    if (!urls?.length) return [];
+
+    return urls.map((url, index) => ({
+        id: `${index}-${uid()}`,
+        url,
+        name: 'Mevcut Görsel',
+    }));
+}
+
+function formatRelativeTime(date?: Date | null): string {
+    if (!date) return '';
+    const diff = Date.now() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'az önce';
+    if (minutes < 60) return `${minutes} dakika önce`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} saat önce`;
+    const days = Math.floor(hours / 24);
+    return `${days} gün önce`;
+}
+
+export default function ProjectCreate({ draft }: Props) {
+    const page = usePage();
+    const [currentStep, setCurrentStep] = useState(draft?.current_step ?? 1);
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [draftId, setDraftId] = useState<number | null>(draft?.id ?? null);
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
+    const [autoSaveState, setAutoSaveState] = useState<'idle' | 'saving' | 'saved' | 'unsaved'>(draftId ? 'saved' : 'unsaved');
+    const [lastSavedAt, setLastSavedAt] = useState<Date | null>(draft ? new Date(draft.updated_at) : null);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const previousStepRef = useRef(currentStep);
 
-    const [projectData, setProjectData] = useState<ProjectFormData>({
-        name: '',
-        public_name: '',
-        description: '',
-        overview: '',
-        developer: '',
-        construction_company: '',
-        marketing_company: '',
-        location: '',
-        city: '',
-        country: 'UAE',
-        district: '',
-        neighborhood: '',
-        street: '',
-        building_no: '',
-        address_details: '',
-        citizenship_eligibility: 'eligible',
-        has_rental_guarantee: false,
-        rental_guarantee_years: '',
-        has_buyback_guarantee: false,
-        buyback_value_loss_percentage: '',
-        is_government_housing: false,
-        has_title_deed: true,
-        unit_type: '',
-        project_type: '',
-        view_type: '',
-        payment_plan: 'cash',
-        down_payment_amount: '',
-        installment_months: '',
-        vat_included: true,
-        vat_rate: '',
-        commission_included: false,
-        commission_rate: '',
-        min_price: '',
-        max_price: '',
-        currency: 'AED',
-        status: 'planning',
-        completion_date: '',
-        delivery_status: '',
-        total_units: 0,
-        hero_title: '',
-        hero_subtitle: '',
-        overview_tr: '',
-        overview_en: '',
-        overview_ar: '',
-        hero_title_tr: '',
-        hero_title_en: '',
-        hero_title_ar: '',
-        hero_subtitle_tr: '',
-        hero_subtitle_en: '',
-        hero_subtitle_ar: '',
-        is_featured: false,
-        is_active: true,
-    });
+    const [projectData, setProjectData] = useState<ProjectFormData>(() => hydrateProjectData(draft));
+    const [units, setUnits] = useState<UnitData[]>(() => hydrateUnits(draft));
+    const [amenities, setAmenities] = useState<AmenityData[]>(() => hydrateAmenities(draft));
+    const [heroImages, setHeroImages] = useState<ImageFile[]>(() => hydrateImages(draft?.draft_hero_images));
+    const [galleryImages, setGalleryImages] = useState<ImageFile[]>(() => hydrateImages(draft?.draft_gallery_images));
 
-    const [units, setUnits] = useState<UnitData[]>([]);
-    const [amenities, setAmenities] = useState<AmenityData[]>([]);
-    const [heroImages, setHeroImages] = useState<ImageFile[]>([]);
-    const [galleryImages, setGalleryImages] = useState<ImageFile[]>([]);
+    const markUnsaved = () => {
+        setAutoSaveState('unsaved');
+        setHasUnsavedChanges(true);
+        setSaveError(null);
+    };
 
     const updateProjectData = (field: string, value: string | number | boolean) => {
         setProjectData((prev) => ({ ...prev, [field]: value }));
+        markUnsaved();
     };
 
-    const handleSubmit = () => {
-        setProcessing(true);
-        setErrors({});
+    const handleUnitsChange = (nextUnits: UnitData[]) => {
+        setUnits(nextUnits);
+        markUnsaved();
+    };
 
+    const handleAmenitiesChange = (nextAmenities: AmenityData[]) => {
+        setAmenities(nextAmenities);
+        markUnsaved();
+    };
+
+    const handleHeroImagesChange = (next: ImageFile[]) => {
+        setHeroImages(next);
+        markUnsaved();
+    };
+
+    const handleGalleryImagesChange = (next: ImageFile[]) => {
+        setGalleryImages(next);
+        markUnsaved();
+    };
+
+    useEffect(() => {
+        const handler = (e: BeforeUnloadEvent) => {
+            if (hasUnsavedChanges && !draftId) {
+                e.preventDefault();
+                e.returnValue = 'Kaydedilmemiş değişiklikler var.';
+            }
+        };
+        window.addEventListener('beforeunload', handler);
+        return () => window.removeEventListener('beforeunload', handler);
+    }, [hasUnsavedChanges, draftId]);
+
+    useEffect(() => {
+        if (!draftId) return;
+        if (previousStepRef.current !== currentStep) {
+            previousStepRef.current = currentStep;
+            void handleAutoSave();
+        }
+    }, [currentStep, draftId]);
+
+    const buildFormData = (method: 'POST' | 'PUT' = 'POST', stayOnPage = false) => {
         const formData = new FormData();
 
-        // Add project data
+        if (method === 'PUT') {
+            formData.append('_method', 'PUT');
+        }
+
+        formData.append('current_step', currentStep.toString());
+
         Object.entries(projectData).forEach(([key, value]) => {
             if (value !== null && value !== undefined && value !== '') {
                 if (typeof value === 'boolean') {
@@ -128,91 +323,229 @@ export default function ProjectCreate() {
 
         formData.append('total_units', units.length.toString());
 
-        // Add amenities as JSON
         if (amenities.length > 0) {
             const amenitiesData = amenities.map(({ id, ...amenity }) => amenity);
             formData.append('project_amenities', JSON.stringify(amenitiesData));
         }
 
-        // Add units as JSON
         if (units.length > 0) {
             const unitsData = units.map(({ id, ...unit }) => unit);
             formData.append('units', JSON.stringify(unitsData));
         }
 
-        // Add hero images
+        const existingHero = heroImages.filter((img) => !img.file).map((img) => img.url);
+        const existingGallery = galleryImages.filter((img) => !img.file).map((img) => img.url);
+
+        existingHero.forEach((url) => formData.append('existing_draft_hero_images[]', url));
+        existingGallery.forEach((url) => formData.append('existing_draft_gallery_images[]', url));
+
         heroImages.forEach((image, index) => {
             if (image.file) {
                 formData.append(`hero_images[${index}]`, image.file);
             }
         });
 
-        // Add gallery images
         galleryImages.forEach((image, index) => {
             if (image.file) {
                 formData.append(`gallery_images[${index}]`, image.file);
             }
         });
 
-        console.log('Submitting project with data:', {
-            projectData,
-            units: units.length,
-            amenities: amenities.length,
-            heroImages: heroImages.length,
-            galleryImages: galleryImages.length,
-        });
+        if (stayOnPage) {
+            formData.append('stay_on_page', '1');
+        }
 
-        // Debug: Log all FormData entries
-        const formDataEntries: Record<string, any> = {};
-        formData.forEach((value, key) => {
-            formDataEntries[key] = value instanceof File ? `File: ${value.name}` : value;
-        });
-        console.log('FormData entries:', formDataEntries);
+        return formData;
+    };
 
-        router.post(store().url, formData, {
+    const saveDraftRequest = async (stayOnPage: boolean) => {
+        if (isSavingDraft) return;
+        setIsSavingDraft(true);
+        setAutoSaveState('saving');
+        setSaveError(null);
+
+        const isUpdate = Boolean(draftId);
+        const url = isUpdate ? `/projects/drafts/${draftId}` : '/projects/drafts';
+        const formData = buildFormData(isUpdate ? 'PUT' : 'POST', stayOnPage);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData,
+            });
+
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                const validationErrors: Record<string, string> = {};
+                Object.entries(payload?.errors ?? {}).forEach(([key, value]) => {
+                    validationErrors[key] = Array.isArray(value) ? value.join(' ') : String(value);
+                });
+                setErrors(validationErrors);
+                setAutoSaveState('unsaved');
+                setSaveError(payload?.message ?? 'Taslak kaydedilemedi.');
+                return null;
+            }
+
+            setErrors({});
+            setDraftId(payload?.draft?.id ? Number(payload.draft.id) : draftId);
+            setAutoSaveState('saved');
+            setHasUnsavedChanges(false);
+            setLastSavedAt(payload?.draft?.updated_at ? new Date(payload.draft.updated_at) : new Date());
+
+            return payload?.draft?.id ?? draftId;
+        } catch (error) {
+            setSaveError('Taslak kaydedilirken bir hata oluştu.');
+            setAutoSaveState('unsaved');
+            return null;
+        } finally {
+            setIsSavingDraft(false);
+        }
+    };
+
+    const handleAutoSave = async () => {
+        if (!draftId) return;
+        await saveDraftRequest(true);
+    };
+
+    const handleManualSave = async () => {
+        setErrors({});
+        setSaveError(null);
+        setIsSavingDraft(true);
+
+        // New draft -> follow spec: redirect to /projects after save
+        if (!draftId) {
+            const formData = buildFormData('POST', false);
+            router.post('/projects/drafts', formData, {
+                forceFormData: true,
+                onError: (incomingErrors) => {
+                    const formatted: Record<string, string> = {};
+                    Object.entries(incomingErrors).forEach(([key, value]) => {
+                        formatted[key] = Array.isArray(value) ? value.join(' ') : String(value);
+                    });
+                    setErrors(formatted);
+                },
+                onFinish: () => setIsSavingDraft(false),
+            });
+            return;
+        }
+
+        // Existing draft -> stay on page
+        await saveDraftRequest(true);
+    };
+
+    const ensureDraftExists = async (): Promise<number | null> => {
+        if (draftId) return draftId;
+        return await saveDraftRequest(true);
+    };
+
+    const handlePublish = async () => {
+        setProcessing(true);
+        setErrors({});
+        setSaveError(null);
+
+        const ensuredDraftId = await ensureDraftExists();
+        if (!ensuredDraftId) {
+            setProcessing(false);
+            return;
+        }
+
+        const formData = buildFormData('POST', false);
+
+        router.post(`/projects/drafts/${ensuredDraftId}/publish`, formData, {
             forceFormData: true,
-            onError: (errors) => {
-                console.error('Project creation errors:', errors);
-                setErrors(errors);
+            preserveScroll: true,
+            onError: (incomingErrors) => {
+                const formatted: Record<string, string> = {};
+                Object.entries(incomingErrors).forEach(([key, value]) => {
+                    formatted[key] = Array.isArray(value) ? value.join(' ') : String(value);
+                });
+                setErrors(formatted);
                 setProcessing(false);
-                // Scroll to top to show errors
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
             onSuccess: () => {
-                console.log('Project created successfully');
                 setProcessing(false);
+                setHasUnsavedChanges(false);
             },
-            onFinish: () => {
-                setProcessing(false);
-            },
+            onFinish: () => setProcessing(false),
         });
     };
 
-    const canProceed = () => {
+    const canProceed = useMemo(() => {
         switch (currentStep) {
             case 1:
                 return projectData.name && projectData.developer;
             case 2:
                 return projectData.location && projectData.city;
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                return true;
             default:
-                return false;
+                return true;
         }
-    };
+    }, [currentStep, projectData.city, projectData.developer, projectData.location, projectData.name]);
+
+    const autoSaveLabel = useMemo(() => {
+        switch (autoSaveState) {
+            case 'saving':
+                return 'Kaydediliyor...';
+            case 'saved':
+                return lastSavedAt ? `Kaydedildi • ${formatRelativeTime(lastSavedAt)}` : 'Kaydedildi';
+            case 'unsaved':
+                return 'Kaydedilmemiş değişiklikler';
+            default:
+                return '';
+        }
+    }, [autoSaveState, lastSavedAt]);
+
+    const flashSuccess = (page.props as any)?.flash?.success;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Proje Oluştur" />
+            <Head title={draftId ? 'Taslak Düzenle' : 'Proje Oluştur'} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <h1 className="text-2xl font-bold">Yeni Proje Oluştur</h1>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold">{draftId ? 'Proje Taslağı' : 'Yeni Proje Oluştur'}</h1>
+                        {draftId && (
+                            <p className="text-sm text-muted-foreground">
+                                Taslak modunda çalışıyorsunuz. Taslağınızı kaydedip daha sonra yayınlayabilirsiniz.
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm">
+                            {autoSaveState === 'saving' && <Clock4Icon className="h-4 w-4 text-muted-foreground" />}
+                            {autoSaveState === 'saved' && <CheckIcon className="h-4 w-4 text-green-600" />}
+                            {autoSaveState === 'unsaved' && <AlertCircle className="h-4 w-4 text-amber-600" />}
+                            <span className="text-muted-foreground">{autoSaveLabel}</span>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={handleManualSave}
+                            disabled={isSavingDraft}
+                        >
+                            <SaveIcon className="mr-2 h-4 w-4" />
+                            {draftId ? 'Kaydet' : 'Taslak Olarak Kaydet'}
+                        </Button>
+                    </div>
+                </div>
 
-                {/* Error Display */}
+                {flashSuccess && (
+                    <Alert>
+                        <CheckIcon className="h-4 w-4" />
+                        <AlertTitle>Başarılı</AlertTitle>
+                        <AlertDescription>{flashSuccess}</AlertDescription>
+                    </Alert>
+                )}
+
+                {saveError && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Kaydetme Hatası</AlertTitle>
+                        <AlertDescription>{saveError}</AlertDescription>
+                    </Alert>
+                )}
+
                 {Object.keys(errors).length > 0 && (
                     <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
@@ -229,7 +562,11 @@ export default function ProjectCreate() {
                     </Alert>
                 )}
 
-                {/* Step Indicator */}
+                <div className="flex items-center gap-3">
+                    <Badge variant="outline">{draftId ? `Taslak #${draftId}` : 'Yeni Taslak'}</Badge>
+                    <Badge variant="secondary">{currentStep}/8</Badge>
+                </div>
+
                 <nav aria-label="Progress">
                     <ol className="flex items-center">
                         {steps.map((step, stepIdx) => (
@@ -242,8 +579,8 @@ export default function ProjectCreate() {
                                             step.id < currentStep
                                                 ? 'bg-primary text-primary-foreground cursor-pointer'
                                                 : step.id === currentStep
-                                                  ? 'border-2 border-primary bg-background'
-                                                  : 'border-2 border-muted bg-background'
+                                                    ? 'border-2 border-primary bg-background'
+                                                    : 'border-2 border-muted bg-background'
                                         }`}
                                     >
                                         {step.id < currentStep ? (
@@ -273,8 +610,14 @@ export default function ProjectCreate() {
                 </nav>
 
                 <Card>
-                    <CardHeader>
-                        <CardTitle>{steps[currentStep - 1].name}</CardTitle>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>{steps[currentStep - 1].name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">{steps[currentStep - 1].description}</p>
+                        </div>
+                        {draftId && (
+                            <Badge variant="secondary">Taslak Modu</Badge>
+                        )}
                     </CardHeader>
                     <CardContent>
                         {currentStep === 1 && (
@@ -312,7 +655,7 @@ export default function ProjectCreate() {
                         {currentStep === 5 && (
                             <AmenitiesStep
                                 amenities={amenities}
-                                setAmenities={setAmenities}
+                                setAmenities={handleAmenitiesChange}
                                 errors={errors}
                             />
                         )}
@@ -320,9 +663,9 @@ export default function ProjectCreate() {
                         {currentStep === 6 && (
                             <ImagesStep
                                 heroImages={heroImages}
-                                setHeroImages={setHeroImages}
+                                setHeroImages={handleHeroImagesChange}
                                 galleryImages={galleryImages}
-                                setGalleryImages={setGalleryImages}
+                                setGalleryImages={handleGalleryImagesChange}
                                 errors={errors}
                             />
                         )}
@@ -330,7 +673,7 @@ export default function ProjectCreate() {
                         {currentStep === 7 && (
                             <UnitsStep
                                 units={units}
-                                setUnits={setUnits}
+                                setUnits={handleUnitsChange}
                                 currency={projectData.currency}
                             />
                         )}
@@ -343,7 +686,6 @@ export default function ProjectCreate() {
                             />
                         )}
 
-                        {/* Navigation Buttons */}
                         <div className="mt-8 flex justify-between">
                             <Button
                                 type="button"
@@ -357,7 +699,7 @@ export default function ProjectCreate() {
                                     <Button
                                         type="button"
                                         onClick={() => setCurrentStep(currentStep + 1)}
-                                        disabled={!canProceed()}
+                                        disabled={!canProceed}
                                     >
                                         Sonraki
                                     </Button>
@@ -365,16 +707,23 @@ export default function ProjectCreate() {
                                 {currentStep === 8 && (
                                     <Button
                                         type="button"
-                                        onClick={handleSubmit}
+                                        onClick={handlePublish}
                                         disabled={processing}
                                     >
-                                        {processing ? 'Oluşturuluyor...' : 'Projeyi Oluştur'}
+                                        {processing ? 'Yayınlanıyor...' : 'Projeyi Yayınla'}
                                     </Button>
                                 )}
                             </div>
                         </div>
                     </CardContent>
                 </Card>
+
+                <Separator />
+
+                <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                    <span>Otomatik kayıt: Adım değişiminde, mevcut taslaklarda devreye girer.</span>
+                    <span>Durum: {autoSaveLabel || 'Hazır'}</span>
+                </div>
             </div>
         </AppLayout>
     );

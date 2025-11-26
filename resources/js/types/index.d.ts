@@ -71,10 +71,15 @@ export interface Project {
     cover_image: string | null;
     is_featured: boolean;
     is_active: boolean;
+    is_draft?: boolean;
+    current_step?: number | null;
+    created_by?: number | null;
     created_at: string;
     updated_at: string;
     units_count?: number;
     units?: Unit[];
+    draft_hero_images?: string[];
+    draft_gallery_images?: string[];
 }
 
 export interface Unit {

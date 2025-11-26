@@ -66,9 +66,8 @@ test('can create project with all new fields', function () {
             // Guarantees
             'has_rental_guarantee' => 1,
             'rental_guarantee_years' => 5,
-            'rental_guarantee_rate' => 7.5,
             'has_buyback_guarantee' => 1,
-            'buyback_guarantee_rate' => 100, // Changed from 110 to 100
+            'buyback_value_loss_percentage' => 10,
 
             // Payment
             'payment_plan' => 'installment',
@@ -104,7 +103,7 @@ test('can create project with all new fields', function () {
         'has_rental_guarantee' => true,
         'rental_guarantee_years' => 5,
         'has_buyback_guarantee' => true,
-        'buyback_guarantee_rate' => 100, // Changed from 110 to 100
+        'buyback_value_loss_percentage' => 10,
         'payment_plan' => 'installment',
         'down_payment_amount' => 100000,
         'installment_months' => 36,

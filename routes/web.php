@@ -18,6 +18,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::post('projects/drafts', [ProjectController::class, 'saveDraft'])->name('projects.drafts.store');
+    Route::put('projects/drafts/{project}', [ProjectController::class, 'updateDraft'])->name('projects.drafts.update');
+    Route::post('projects/drafts/{project}/publish', [ProjectController::class, 'publishDraft'])->name('projects.drafts.publish');
+    Route::get('projects/drafts/{project}/load', [ProjectController::class, 'loadDraft'])->name('projects.drafts.load');
+
     Route::resource('projects', ProjectController::class);
     Route::post('projects/{project}/images', [ProjectController::class, 'uploadImages'])->name('projects.images.upload');
     Route::delete('projects/{project}/images', [ProjectController::class, 'deleteImage'])->name('projects.images.delete');
